@@ -27,86 +27,101 @@ map.on("drag", function () {
   map.panInsideBounds(bounds, { animate: false });
 });
 
-// Define the country border based on geoJSON output from countryBorders.geo.json
+// Functions
 
-const createBorder = (geoJSON) => {
-  L.geoJSON(geoJSON).addTo(map)
-}
-
-// AJAX Functions for CountryBorders.geo.json -
-// Get country borders from Country
-
-const getCountryBorder = (country) => {
-
-}
+// Get coords from current device location
+const getCoordsFromDeviceLocation = async () => {
+  const pos = await new Promise((resolve, reject) => {
+    window.navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+  // console.log(pos.coords);
+  return {
+    latitude: pos.coords.latitude,
+    longitude: pos.coords.longitude,
+  };
+};
 
 // Ajax Functions
 // Get Country Code from device location
 
-const getCountryCodeFromLoc = (lat, lng) => {
-  $.ajax({
-    url: "libs/php/getCountryCode.php",
-    type: "POST",
-    dataType: "json",
-    data: {
-      lat: latitude,
-      lng: longitude
-    },
-    success: function (result) {
-
-    }
-  })
-}
-
-
-window.onload = function () {
-  window.navigator.geolocation.getCurrentPosition((pos) => {
-    ({latitude, longitude} = pos.coords);
-    console.log(latitude);
-    console.log(longitude);
-    // map.fitBounds([latitude, longitude])
+const getCountryCodeFromLoc = async (coords) => {
+  const countryCode = await new Promise((resolve, reject) => {
     $.ajax({
       url: "libs/php/getCountryCode.php",
       type: "POST",
       dataType: "json",
       data: {
-        lat: latitude,
-        lng: longitude
+        lat: coords.latitude,
+        lng: coords.longitude,
       },
       success: function (result) {
-        // console.log(JSON.stringify(result));
         if (result.status.name == "ok") {
-          let countryCode = result.data.countryCode;
-          console.log(countryCode);
-          $.ajax({
-            url: "libs/php/getGeoJSONFromCountryCode.php",
-            type: "POST",
-            dataType: "json",
-            data: {
-              countryCode: countryCode
-            },
-            success: function (result) {
-              console.log(JSON.stringify(result));
-              if (result.status.name == "ok") {
-                
-              }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              console.log(jqXHR);
-              console.log(textStatus);
-              console.log(JSON.stringify(errorThrown));
-            },
-          })
+          resolve(result.data.countryCode);
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
         console.log(textStatus);
         console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown))
+      }
+    })
+  });
+  return countryCode;
+};
+
+// AJAX Functions for CountryBorders.geo.json -
+// Get country borders from Country
+const getCountryBorderFromCountryCode = async (countryCode) => {
+  const border = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: "libs/php/getGeoJSONFromCountryCode.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        countryCode: countryCode,
+      },
+      success: function (result) {
+        if (result.status.name == "ok") {
+          resolve(result.data);
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
+  return border;
 };
+
+// Get Country list from CountryBorders.geo.json
+
+
+// Define the country border based on geoJSON output from countryBorders.geo.json
+const createBorder = (geoJSON) => {
+  L.geoJSON(geoJSON).addTo(map);
+  console.log(geoJSON.geometry.coordinates[0])
+};
+
+// Function run in document.ready (required separately for async calls)
+const loaderFunction = async () => {
+  const coords = await getCoordsFromDeviceLocation();
+  console.log(coords);
+  const countryCode = await getCountryCodeFromLoc(coords);
+  console.log(countryCode);
+  const borderJSON = await getCountryBorderFromCountryCode(countryCode);
+  console.log(borderJSON);
+  createBorder(borderJSON);
+
+};
+
+// JQuery Document.Ready function for page load
+$(function () {
+  loaderFunction();
+});
 
 // var geojsonFeature = {
 //   type: "Feature",
