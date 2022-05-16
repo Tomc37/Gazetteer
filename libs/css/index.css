@@ -10,3 +10,14 @@ html, body, #map {
 .leaflet-bottom {
   display: none;
 }
+
+#map {
+  z-index: 2;
+}
+
+#country {
+  position: fixed;
+  top: 12px;
+  left: 80px;
+  z-index: 3;
+}
