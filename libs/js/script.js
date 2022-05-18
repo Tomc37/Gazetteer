@@ -1,6 +1,9 @@
 
 // Create map
-const map = L.map("map").setView([0, 0], 3);
+  const map = L.map("map").setView([0, 0], 3);
+
+// Create FeatureGroup
+  const countryMarkers = L.featureGroup();
 
 // Load in TileLayer
   L.tileLayer(
@@ -120,10 +123,10 @@ const map = L.map("map").setView([0, 0], 3);
 
 // Define the country border based on geoJSON output from countryBorders.geo.json
   function createBorder(geoJSON) {
-    
-    L.geoJSON(geoJSON).addTo(map);
-    // const bounds = new L.latLngBounds([geoJSON.geometry.coordinates]);
-    // map.fitBounds(bounds);
+    countryMarkers.clearLayers();
+    L.geoJSON(geoJSON).addTo(countryMarkers);
+    countryMarkers.addTo(map);
+    map.fitBounds(countryMarkers.getBounds());
   }
 
 // Function run in document.ready (required separately for async calls)
