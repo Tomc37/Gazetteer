@@ -18,6 +18,6 @@ html, body, #map {
 #country {
   position: fixed;
   top: 12px;
-  left: 80px;
+  left: 70px;
   z-index: 3;
 }
