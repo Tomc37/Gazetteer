@@ -5,13 +5,13 @@
 
 	$executionStartTime = microtime(true);
 
-  $countryCode = $_REQUEST['countryCode'];
+  $countryName = $_REQUEST['countryName'];
    
   $result = file_get_contents("..\util\countryBorders.geo.json");
 	$decode = json_decode("$result");
 	$features = $decode->features;
-	$filtered = array_values(array_filter($features, function($value) use ($countryCode) {
-		if ($value->properties->iso_a2 == $countryCode) {
+	$filtered = array_values(array_filter($features, function($value) use ($countryName) {
+		if ($value->properties->name == $countryName) {
 			return true;
 		} else {
 			return false;
