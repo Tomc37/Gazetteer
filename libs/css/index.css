@@ -11,6 +11,10 @@ html, body, #map {
   display: none;
 }
 
+.leaflet-left {
+  margin-left: 6px;
+}
+
 #map {
   z-index: 2;
 }
@@ -20,4 +24,40 @@ html, body, #map {
   top: 12px;
   left: 70px;
   z-index: 3;
+}
+
+#button-container {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 90px;
+  left: 8px;
+  z-index: 3;
+  width: 40px;
+  height: auto;
+}
+
+.button {
+  z-index: 3;
+  height: 50px;
+  width: 50px;
+  border-radius: 100%;
+  margin-bottom: 1rem;
+  background-color: black;
+}
+
+#stats {
+  background-image: url("../../stats.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: rgb(227, 238, 80);
+  border: 1px solid black;
+}
+
+#weather {
+  background-image: url("../../weather.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: rgb(13, 215, 230);
+  border: 1px solid rgb(16, 18, 49);
 }
