@@ -146,8 +146,15 @@ $(function () {
   loaderFunction();
 });
 
+// Function to run when selecting Country from Select
 $("#country").change(async function () {
+
+  // Pull Country Name from Select list currently selected item
   const countryName = $("#country").val();
+
+  // Get Border details from JSON
   const borderJSON = await getCountryBorderFromCountryName(countryName);
+
+  // Create polyline for selected Country
   createBorder(borderJSON);
 });
