@@ -2,6 +2,7 @@ body {
   padding: 0;
   margin: 0;
 }
+
 html, body, #map {
   height: 100%;
   width: 100%;
@@ -16,14 +17,13 @@ html, body, #map {
 }
 
 #map {
-  z-index: 2;
+  z-index: 1;
 }
-
 #country {
   position: fixed;
   top: 12px;
   left: 70px;
-  z-index: 3;
+  z-index: 2;
 }
 
 #button-container {
@@ -32,32 +32,63 @@ html, body, #map {
   flex-direction: column;
   top: 90px;
   left: 8px;
-  z-index: 3;
+  z-index: 2;
   width: 40px;
   height: auto;
 }
 
 .button {
-  z-index: 3;
   height: 50px;
   width: 50px;
   border-radius: 100%;
   margin-bottom: 1rem;
   background-color: black;
+  border: solid white 3px;
 }
 
-#stats {
+#stats-button {
   background-image: url("../util/Images/stats.png");
   background-repeat: no-repeat;
   background-size: cover;
-  background-color: rgb(227, 238, 80);
-  border: 1px solid black;
 }
 
-#weather {
+#weather-button {
   background-image: url("../util/Images/weather.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-color: rgb(13, 215, 230);
-  border: 1px solid rgb(16, 18, 49);
+}
+
+#covid-button {
+  background-image: url("../util/Images/covid.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#stats-modal {
+  background-color: white;
+  height: 600px;
+  width: 600px;
+  margin-left: -300px;
+  margin-top: -300px;
+}
+
+#weather-modal {
+  background-color: white;
+  height: 600px;
+  width: 600px;
+  margin-left: -300px;
+  margin-top: -300px;
+}
+
+#covid-modal {
+  background-color: white;
+  height: 600px;
+  width: 600px;
+  margin-left: -300px;
+  margin-top: -300px;
+}
+
+.modal-backdrop {
+  z-index: 5;
 }

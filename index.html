@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Gazetteer</title>
-    <link rel="icon" type="image/x-icon" href="world.png">
+    <link rel="icon" type="image/x-icon" href="world.png" />
     <meta
       name="viewport"
       content="width=device-width, height=device-height, initial-scale=1, shrink-to-fit=no"
@@ -30,10 +30,77 @@
     <div id="map"></div>
     <select name="country" id="country"></select>
     <div id="button-container">
-      <div class="button" id="stats"></div>
-      <div class="button" id="weather"></div>
-      <div class="button"></div>
-      <div class="button"></div>
+      <button
+        class="button btn"
+        id="stats-button"
+        data-bs-toggle="modal"
+        data-bs-target="#stats-modal"
+      ></button>
+      <div
+        class="button btn"
+        id="weather-button"
+        data-bs-toggle="modal"
+        data-bs-target="#weather-modal"
+      ></div>
+      <div
+        class="button btn"
+        id="covid-button"
+        data-bs-toggle="modal"
+        data-bs-target="#covid-modal"
+      ></div>
+    </div>
+    <div id="modal-container">
+      <div class="modal fade top-50 start-50" id="stats-modal">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h5>Country Information</h5>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade top-50 start-50" id="weather-modal">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h5>Weather Information</h5>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade top-50 start-50" id="covid-modal">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h5>Covid Information</h5>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <script
       type="application/javascript"
