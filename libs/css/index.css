@@ -67,7 +67,7 @@ html, body, #map {
 
 #stats-modal {
   background-color: white;
-  height: 600px;
+  height: auto;
   width: 600px;
   margin-left: -300px;
   margin-top: -300px;
@@ -75,7 +75,7 @@ html, body, #map {
 
 #weather-modal {
   background-color: white;
-  height: 600px;
+  height: auto;
   width: 600px;
   margin-left: -300px;
   margin-top: -300px;
@@ -83,14 +83,10 @@ html, body, #map {
 
 #covid-modal {
   background-color: white;
-  height: 600px;
+  height: auto;
   width: 600px;
   margin-left: -300px;
   margin-top: -300px;
-}
-
-.modal-backdrop {
-  z-index: 5;
 }
 
 .modal-footer {
@@ -102,6 +98,7 @@ html, body, #map {
   margin: 0 auto;
   width: 200px;
   height: auto;
+  border: solid 1px black;
 }
 
 table {
