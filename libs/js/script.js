@@ -16,7 +16,7 @@ L.tileLayer(
 ).addTo(map);
 
 // Create object to store coords and country data
-const countryObject = {};
+let countryObject = {};
 
 // Get coords from current device location
 const getCoordsFromDeviceLocation = async () => {
@@ -117,7 +117,60 @@ function createBorder(geoJSON) {
   map.fitBounds(countryMarkersFeatureGroup.getBounds());
 }
 
-// Function to gather all API data needed for Overlay
+// AJAX functions to gather all API data needed for Overlay
+// Country Basic Data from https://restcountries.com
+const getCountryBasicData = async (countryCode) => {
+  const countryBasicData = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
+      type: "GET",
+      dataType: "JSON",
+      success: function(result) {
+        resolve(result);
+      }
+    })
+  })
+  return countryBasicData[0];
+}
+
+// Weather data from https://www.visualcrossing.com/
+const getWeatherData = async (cityName) => {
+  const countryWeatherData = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${cityName}?unitGroup=metric&key=ULZ8VH9ZR2MR8HA5M4C4TT3JP&contentType=json`,
+      type: "GET",
+      dataType: "JSON",
+      success: function(result) {
+        resolve(result);
+      }
+    })
+  })
+  return countryWeatherData;
+}
+
+// Covid data from https://corona-api.com/
+const getCovidData = async (countryCode) => {
+  const covidData = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: `https://corona-api.com/countries/${countryCode}`,
+      type: "GET",
+      dataType: "JSON",
+      success: function(result) {
+        resolve(result);
+      }
+    })
+  })
+  return covidData.data;
+}
+
+// Group API Function Calls for eventual loading into countryObject
+const getAllAPIData = async (countryCode) => {{
+  const countryBasicData = await getCountryBasicData(countryCode);
+  const countryWeatherData = await getWeatherData(countryBasicData.capital);
+  const countryCovidData = await getCovidData(countryCode);
+  return {countryBasicData, countryWeatherData, countryCovidData};
+}}
+
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
 const loaderFunction = async () => {
@@ -143,6 +196,9 @@ const loaderFunction = async () => {
   // Use border details for Country to create polyline on map
   createBorder(countryObject.borderJSON);
 
+  // Get All API Data
+  countryObject.countryAPIData = await getAllAPIData(countryObject.borderJSON.properties.iso_a2)
+
   // Test countryObject
   console.log(countryObject);
 };
@@ -155,21 +211,20 @@ $(function () {
 // Function to run when selecting Country from Select
 $("#country").change(async function () {
 
+  // Clear countryObject
+  countryObject = {};
+
   // Pull Country Name from Select list currently selected item
   countryObject.countryName = $("#country").val();
 
   // Get Border details from JSON
   countryObject.borderJSON = await getCountryBorderFromCountryName(countryObject.countryName);
 
-  // Set current coords as coords from new border details from JSON
-  countryObject.coords.latitude = countryObject.borderJSON.geometry.coordinates[0][0][0];
-  countryObject.coords.longitude = countryObject.borderJSON.geometry.coordinates[0][0][1];
-
-  // Get country data from Geonames from coords, languages, countryCode, countryName
-  countryObject.countryDataFromGeoNames = await getCountryFromLoc(countryObject.coords);
-
   // Create polyline for selected Country
   createBorder(countryObject.borderJSON);
+
+  // Get All API Data
+  countryObject.countryAPIData = await getAllAPIData(countryObject.borderJSON.properties.iso_a2)
 
   // Test countryObject
   console.log(countryObject);
