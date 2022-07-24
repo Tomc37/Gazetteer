@@ -47,7 +47,7 @@ html, body, #map {
 }
 
 #stats {
-  background-image: url("../../stats.png");
+  background-image: url("../util/Images/stats.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-color: rgb(227, 238, 80);
@@ -55,7 +55,7 @@ html, body, #map {
 }
 
 #weather {
-  background-image: url("../../weather.png");
+  background-image: url("../util/Images/weather.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-color: rgb(13, 215, 230);
