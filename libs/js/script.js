@@ -15,6 +15,9 @@ L.tileLayer(
   }
 ).addTo(map);
 
+// Create object to store coords and country data
+const countryObject = {};
+
 // Get coords from current device location
 const getCoordsFromDeviceLocation = async () => {
   const pos = await new Promise((resolve, reject) => {
@@ -126,19 +129,22 @@ const loaderFunction = async () => {
   });
 
   // Get lat and long coords from device location
-  const coords = await getCoordsFromDeviceLocation();
+  countryObject.coords = await getCoordsFromDeviceLocation();
 
   // Get country data from Geonames from coords, languages, countryCode, countryName
-  const countryFromGeoNames = await getCountryFromLoc(coords);
+  countryObject.countryDataFromGeoNames = await getCountryFromLoc(countryObject.coords);
 
   // Get border details for Country from JSON and highlight country as selected in Select html element
-  const borderJSON = await getCountryBorderFromCountryName(
-    countryFromGeoNames.countryName
+  countryObject.borderJSON = await getCountryBorderFromCountryName(
+    countryObject.countryDataFromGeoNames.countryName
   );
-  $("#country").val(countryFromGeoNames.countryName);
+  $("#country").val(countryObject.countryDataFromGeoNames.countryName);
 
   // Use border details for Country to create polyline on map
-  createBorder(borderJSON);
+  createBorder(countryObject.borderJSON);
+
+  // Test countryObject
+  console.log(countryObject);
 };
 
 // JQuery Document.Ready function for page load
@@ -150,11 +156,21 @@ $(function () {
 $("#country").change(async function () {
 
   // Pull Country Name from Select list currently selected item
-  const countryName = $("#country").val();
+  countryObject.countryName = $("#country").val();
 
   // Get Border details from JSON
-  const borderJSON = await getCountryBorderFromCountryName(countryName);
+  countryObject.borderJSON = await getCountryBorderFromCountryName(countryObject.countryName);
+
+  // Set current coords as coords from new border details from JSON
+  countryObject.coords.latitude = countryObject.borderJSON.geometry.coordinates[0][0][0];
+  countryObject.coords.longitude = countryObject.borderJSON.geometry.coordinates[0][0][1];
+
+  // Get country data from Geonames from coords, languages, countryCode, countryName
+  countryObject.countryDataFromGeoNames = await getCountryFromLoc(countryObject.coords);
 
   // Create polyline for selected Country
-  createBorder(borderJSON);
+  createBorder(countryObject.borderJSON);
+
+  // Test countryObject
+  console.log(countryObject);
 });
