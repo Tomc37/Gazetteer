@@ -171,6 +171,17 @@ const getAllAPIData = async (countryCode) => {{
   return {countryBasicData, countryWeatherData, countryCovidData};
 }}
 
+// JQuery HTML Replacers
+const apiToHTML = (countryAPIData) => {
+  $("#stats-flag").attr("src", countryAPIData.countryBasicData.flags.png);
+  $("#country-name").html(countryAPIData.countryBasicData.name.common);
+  $("#country-code").html(countryAPIData.countryBasicData.cca2);
+  $("#population").html(countryAPIData.countryBasicData.population);
+  $("#capital").html(countryAPIData.countryBasicData.capital);
+  const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
+  $("#currency").html(`${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`);
+  $("#continent").html(countryAPIData.countryBasicData.region);
+}
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
 const loaderFunction = async () => {
@@ -199,6 +210,9 @@ const loaderFunction = async () => {
   // Get All API Data
   countryObject.countryAPIData = await getAllAPIData(countryObject.borderJSON.properties.iso_a2)
 
+  // Populate HTML from API data
+  apiToHTML(countryObject.countryAPIData);
+
   // Test countryObject
   console.log(countryObject);
 };
@@ -226,6 +240,9 @@ $("#country").change(async function () {
   // Get All API Data
   countryObject.countryAPIData = await getAllAPIData(countryObject.borderJSON.properties.iso_a2)
 
+  // Populate HTML from API data
+  apiToHTML(countryObject.countryAPIData);
+  
   // Test countryObject
   console.log(countryObject);
 });
