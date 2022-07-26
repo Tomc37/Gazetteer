@@ -101,8 +101,13 @@ html, body, #map {
   border: solid 1px black;
 }
 
-table {
+.table-container {
   margin: 1rem 0;
+  border: solid 1px lightgray;
+  padding: 15px;
+}
+
+table {
   width: 100%;
 }
 
@@ -111,7 +116,7 @@ tbody {
 }
 
 tr {
-  height: 2.5rem;
+  height: 2rem;
 }
 
 .table-head {
@@ -127,4 +132,12 @@ tr {
 
 .table-row-dark {
   background-color: rgb(224, 220, 220);
+}
+
+#weather-icon {
+  display: block;
+  margin: 0 auto;
+  width: 120px;
+  height: auto;
+  border: solid 1px black;
 }

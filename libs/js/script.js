@@ -6,7 +6,7 @@ const countryMarkersFeatureGroup = L.featureGroup();
 
 // Load in LeafletJS TileLayer
 L.tileLayer(
-  "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+  "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=4e4765b2-fdfd-45d0-ba9a-bfe35596092d",
   {
     minZoom: 2,
     maxZoom: 10,
@@ -181,6 +181,8 @@ const apiToHTML = (countryAPIData) => {
   const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
   $("#currency").html(`${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`);
   $("#continent").html(countryAPIData.countryBasicData.region);
+  $("#weather-title").html(`Weather in ${countryAPIData.countryWeatherData.address}`);
+  $("#weather-icon").attr("src", `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`);
 }
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
