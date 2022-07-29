@@ -173,6 +173,7 @@ const getAllAPIData = async (countryCode) => {{
 
 // JQuery HTML Replacers
 const apiToHTML = (countryAPIData) => {
+  // Basic Info
   $("#stats-flag").attr("src", countryAPIData.countryBasicData.flags.png);
   $("#country-name").html(countryAPIData.countryBasicData.name.common);
   $("#country-code").html(countryAPIData.countryBasicData.cca2);
@@ -181,8 +182,15 @@ const apiToHTML = (countryAPIData) => {
   const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
   $("#currency").html(`${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`);
   $("#continent").html(countryAPIData.countryBasicData.region);
+  // Weather
   $("#weather-title").html(`Weather in ${countryAPIData.countryWeatherData.address}`);
   $("#weather-icon").attr("src", `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`);
+  $("#weather-description").html(countryAPIData.countryWeatherData.currentConditions.conditions);
+  $("#weather-time").html(countryAPIData.countryWeatherData.currentConditions.datetime);
+  $("#weather-temperature").html(`${countryAPIData.countryWeatherData.currentConditions.temp}C`);
+  $("#weather-wind-speed").html(`${countryAPIData.countryWeatherData.currentConditions.windspeed}mph`);
+  $("#weather-uv-index").html(countryAPIData.countryWeatherData.currentConditions.uvindex);
+  $("#weather-forecast").html(countryAPIData.countryWeatherData.description);
 }
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.

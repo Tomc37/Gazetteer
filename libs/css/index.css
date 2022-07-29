@@ -90,6 +90,10 @@ html, body, #map {
   margin-top: -300px;
 }
 
+.modal-header {
+  justify-content: center;
+}
+
 .modal-footer {
   justify-content: center;
 }
@@ -140,5 +144,9 @@ tr {
   margin: 0 auto;
   width: 120px;
   height: auto;
-  border: solid 1px black;
+  border: solid 1px rgb(207, 205, 205);
+}
+
+@media scren and (max-width: 400px) {
+  
 }
