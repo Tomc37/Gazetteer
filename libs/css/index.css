@@ -1,12 +1,12 @@
 body {
   padding: 0;
   margin: 0;
-  background-color: black;
 }
 
 html, body, #map {
   height: 100%;
   width: 100%;
+  background-color: #222222;  
 }
 
 .leaflet-bottom {
