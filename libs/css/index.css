@@ -19,6 +19,7 @@ html, body, #map {
 #map {
   z-index: 1;
 }
+
 #country {
   position: fixed;
   top: 12px;

@@ -117,7 +117,7 @@ function createBorder(geoJSON) {
   map.fitBounds(countryMarkersFeatureGroup.getBounds());
 }
 
-// AJAX functions to gather all API data needed for Overlay
+// AJAX functions to gather all API data needed for Overlays
 // Country Basic Data from https://restcountries.com
 const getCountryBasicData = async (countryCode) => {
   const countryBasicData = await new Promise((resolve, reject) => {
