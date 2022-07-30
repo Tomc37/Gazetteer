@@ -153,7 +153,8 @@ tr {
     background-color: white;
     height: auto;
     width: 300px;
-    margin-left: -150px
+    margin-left: -150px;
+    margin-top: -250px;
   }
 
   #stats-flag {
