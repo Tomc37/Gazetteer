@@ -314,3 +314,11 @@ $("#country").click(function () {
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });
+
+$("#map").click(function () {
+  $("#stats-modal").modal("hide");
+  $("#covid-modal").modal("hide");
+  $("#weather-modal").modal("hide");
+  $("body").removeClass("modal-open");
+  $(".modal-backdrop").remove();
+});
