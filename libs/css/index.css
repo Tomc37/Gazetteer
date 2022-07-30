@@ -79,8 +79,16 @@ html, body, #map {
   justify-content: center;
 }
 
+.modal-body {
+  padding: 8px;
+}
+
 .modal-footer {
   justify-content: center;
+}
+
+.modal-backdrop {
+  display: none;
 }
 
 #stats-flag {
@@ -132,6 +140,14 @@ tr {
   border: solid 1px rgb(207, 205, 205);
 }
 
+#covid-icon {
+  display: block;
+  margin: 0 auto;
+  width: 120px;
+  height: auto;
+  padding: 3px;
+}
+
 @media screen and (max-width: 400px) {
   .modal {
     background-color: white;
@@ -154,5 +170,16 @@ tr {
     width: 80px;
     height: auto;
     border: solid 1px rgb(207, 205, 205);
+  }
+
+  #covid-icon {
+    display: block;
+    margin: 0 auto;
+    width: 80px;
+    height: auto;
+  }
+
+  tr {
+    font-size: .75rem;
   }
 }

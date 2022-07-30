@@ -125,13 +125,17 @@ const getCountryBasicData = async (countryCode) => {
       url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
       type: "GET",
       dataType: "JSON",
-      success: function(result) {
+      success: function (result) {
         resolve(result);
-      }
-    })
-  })
+      },
+      error: function (error) {
+        console.log(error);
+        reject(JSON.stringify(error));
+      },
+    });
+  });
   return countryBasicData[0];
-}
+};
 
 // Weather data from https://www.visualcrossing.com/
 const getWeatherData = async (cityName) => {
@@ -140,13 +144,17 @@ const getWeatherData = async (cityName) => {
       url: `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${cityName}?unitGroup=metric&key=ULZ8VH9ZR2MR8HA5M4C4TT3JP&contentType=json`,
       type: "GET",
       dataType: "JSON",
-      success: function(result) {
+      success: function (result) {
         resolve(result);
-      }
-    })
-  })
+      },
+      error: function (error) {
+        console.log(error);
+        reject(JSON.stringify(error));
+      },
+    });
+  });
   return countryWeatherData;
-}
+};
 
 // Covid data from https://corona-api.com/
 const getCovidData = async (countryCode) => {
@@ -155,21 +163,27 @@ const getCovidData = async (countryCode) => {
       url: `https://corona-api.com/countries/${countryCode}`,
       type: "GET",
       dataType: "JSON",
-      success: function(result) {
+      success: function (result) {
         resolve(result);
-      }
-    })
-  })
+      },
+      error: function (error) {
+        console.log(error);
+        reject(JSON.stringify(error));
+      },
+    });
+  });
   return covidData.data;
-}
+};
 
 // Group API Function Calls for eventual loading into countryObject
-const getAllAPIData = async (countryCode) => {{
-  const countryBasicData = await getCountryBasicData(countryCode);
-  const countryWeatherData = await getWeatherData(countryBasicData.capital);
-  const countryCovidData = await getCovidData(countryCode);
-  return {countryBasicData, countryWeatherData, countryCovidData};
-}}
+const getAllAPIData = async (countryCode) => {
+  {
+    const countryBasicData = await getCountryBasicData(countryCode);
+    const countryWeatherData = await getWeatherData(countryBasicData.capital);
+    const countryCovidData = await getCovidData(countryCode);
+    return { countryBasicData, countryWeatherData, countryCovidData };
+  }
+};
 
 // JQuery HTML Replacers
 const apiToHTML = (countryAPIData) => {
@@ -180,18 +194,46 @@ const apiToHTML = (countryAPIData) => {
   $("#population").html(countryAPIData.countryBasicData.population);
   $("#capital").html(countryAPIData.countryBasicData.capital);
   const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
-  $("#currency").html(`${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`);
+  $("#currency").html(
+    `${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`
+  );
   $("#continent").html(countryAPIData.countryBasicData.region);
   // Weather
-  $("#weather-title").html(`Weather in ${countryAPIData.countryWeatherData.address}`);
-  $("#weather-icon").attr("src", `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`);
-  $("#weather-description").html(countryAPIData.countryWeatherData.currentConditions.conditions);
-  $("#weather-time").html(countryAPIData.countryWeatherData.currentConditions.datetime);
-  $("#weather-temperature").html(`${countryAPIData.countryWeatherData.currentConditions.temp}C`);
-  $("#weather-wind-speed").html(`${countryAPIData.countryWeatherData.currentConditions.windspeed}mph`);
-  $("#weather-uv-index").html(countryAPIData.countryWeatherData.currentConditions.uvindex);
+  $("#weather-title").html(
+    `Weather in ${countryAPIData.countryWeatherData.address}`
+  );
+  $("#weather-icon").attr(
+    "src",
+    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`
+  );
+  $("#weather-description").html(
+    countryAPIData.countryWeatherData.currentConditions.conditions
+  );
+  $("#weather-time").html(
+    countryAPIData.countryWeatherData.currentConditions.datetime
+  );
+  $("#weather-temperature").html(
+    `${countryAPIData.countryWeatherData.currentConditions.temp}C`
+  );
+  $("#weather-wind-speed").html(
+    `${countryAPIData.countryWeatherData.currentConditions.windspeed}mph`
+  );
+  $("#weather-uv-index").html(
+    countryAPIData.countryWeatherData.currentConditions.uvindex
+  );
   $("#weather-forecast").html(countryAPIData.countryWeatherData.description);
-}
+  // Covid
+  $("#covid-icon").attr("src", "libs/util/Images/covid.png");
+  $("#covid-confirmed").html(
+    countryAPIData.countryCovidData.latest_data.confirmed
+  );
+  $("#covid-deaths").html(countryAPIData.countryCovidData.latest_data.deaths);
+  $("#covid-recovered").html(
+    countryAPIData.countryCovidData.latest_data.recovered
+  );
+  $("#covid-cases-today").html(countryAPIData.countryCovidData.today.confirmed);
+  $("#covid-deaths-today").html(countryAPIData.countryCovidData.today.deaths);
+};
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
 const loaderFunction = async () => {
@@ -206,7 +248,9 @@ const loaderFunction = async () => {
   countryObject.coords = await getCoordsFromDeviceLocation();
 
   // Get country data from Geonames from coords, languages, countryCode, countryName
-  countryObject.countryDataFromGeoNames = await getCountryFromLoc(countryObject.coords);
+  countryObject.countryDataFromGeoNames = await getCountryFromLoc(
+    countryObject.coords
+  );
 
   // Get border details for Country from JSON and highlight country as selected in Select html element
   countryObject.borderJSON = await getCountryBorderFromCountryName(
@@ -218,7 +262,9 @@ const loaderFunction = async () => {
   createBorder(countryObject.borderJSON);
 
   // Get All API Data
-  countryObject.countryAPIData = await getAllAPIData(countryObject.borderJSON.properties.iso_a2)
+  countryObject.countryAPIData = await getAllAPIData(
+    countryObject.borderJSON.properties.iso_a2
+  );
 
   // Populate HTML from API data
   apiToHTML(countryObject.countryAPIData);
@@ -234,7 +280,6 @@ $(function () {
 
 // Function to run when selecting Country from Select
 $("#country").change(async function () {
-
   // Clear countryObject
   countryObject = {};
 
@@ -242,17 +287,30 @@ $("#country").change(async function () {
   countryObject.countryName = $("#country").val();
 
   // Get Border details from JSON
-  countryObject.borderJSON = await getCountryBorderFromCountryName(countryObject.countryName);
+  countryObject.borderJSON = await getCountryBorderFromCountryName(
+    countryObject.countryName
+  );
 
   // Create polyline for selected Country
   createBorder(countryObject.borderJSON);
 
   // Get All API Data
-  countryObject.countryAPIData = await getAllAPIData(countryObject.borderJSON.properties.iso_a2)
+  countryObject.countryAPIData = await getAllAPIData(
+    countryObject.borderJSON.properties.iso_a2
+  );
 
   // Populate HTML from API data
   apiToHTML(countryObject.countryAPIData);
-  
+
   // Test countryObject
   console.log(countryObject);
+});
+
+// Remove modal on clicks
+$("#country").click(function () {
+  $("#stats-modal").modal("hide");
+  $("#covid-modal").modal("hide");
+  $("#weather-modal").modal("hide");
+  $("body").removeClass("modal-open");
+  $(".modal-backdrop").remove();
 });
