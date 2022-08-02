@@ -308,9 +308,7 @@ $("#country").change(async function () {
 
 // Remove modal on clicks
 $("#country").click(function () {
-  $("#stats-modal").modal("hide");
-  $("#covid-modal").modal("hide");
-  $("#weather-modal").modal("hide");
+  $("#stats-modal, #covid-modal, #weather-modal").modal("hide");
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });
