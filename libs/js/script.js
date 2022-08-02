@@ -185,13 +185,18 @@ const getAllAPIData = async (countryCode) => {
   }
 };
 
+
+const numberFormat = '0,0';
+const timeFormat = "00:00";
 // JQuery HTML Replacers
 const apiToHTML = (countryAPIData) => {
   // Basic Info
   $("#stats-flag").attr("src", countryAPIData.countryBasicData.flags.png);
   $("#country-name").html(countryAPIData.countryBasicData.name.common);
   $("#country-code").html(countryAPIData.countryBasicData.cca2);
-  $("#population").html(countryAPIData.countryBasicData.population);
+  $("#population").html(
+    numeral(countryAPIData.countryBasicData.population).format(numberFormat)
+  );
   $("#capital").html(countryAPIData.countryBasicData.capital);
   const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
   $("#currency").html(
@@ -210,7 +215,7 @@ const apiToHTML = (countryAPIData) => {
     countryAPIData.countryWeatherData.currentConditions.conditions
   );
   $("#weather-time").html(
-    countryAPIData.countryWeatherData.currentConditions.datetime
+    numeral(countryAPIData.countryWeatherData.currentConditions.datetime).format(timeFormat)
   );
   $("#weather-temperature").html(
     `${countryAPIData.countryWeatherData.currentConditions.temp}C`
@@ -225,14 +230,14 @@ const apiToHTML = (countryAPIData) => {
   // Covid
   $("#covid-icon").attr("src", "libs/util/Images/covid.png");
   $("#covid-confirmed").html(
-    countryAPIData.countryCovidData.latest_data.confirmed
+    numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(numberFormat)
   );
-  $("#covid-deaths").html(countryAPIData.countryCovidData.latest_data.deaths);
+  $("#covid-deaths").html(numeral(countryAPIData.countryCovidData.latest_data.deaths).format(numberFormat));
   $("#covid-recovered").html(
-    countryAPIData.countryCovidData.latest_data.recovered
+    numeral(countryAPIData.countryCovidData.latest_data.recovered).format(numberFormat)
   );
-  $("#covid-cases-today").html(countryAPIData.countryCovidData.today.confirmed);
-  $("#covid-deaths-today").html(countryAPIData.countryCovidData.today.deaths);
+  $("#covid-cases-today").html(numeral(countryAPIData.countryCovidData.today.confirmed).format(numberFormat));
+  $("#covid-deaths-today").html(numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat));
 };
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
