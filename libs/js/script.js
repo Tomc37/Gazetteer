@@ -55,21 +55,20 @@ const getCountryFromLoc = async (coords) => {
       },
     });
   });
-  console.log(countryCode);
   return countryCode;
 };
 
 // AJAX Functions to parse CountryBorders.geo.json
 
-// Get country borders from countryBorders.geo.json from Country name
-const getCountryBorderFromCountryName = async (countryName) => {
+// Get country borders from countryBorders.geo.json from Country code
+const getCountryBorderFromCountryCode = async (countryCode) => {
   const border = await new Promise((resolve, reject) => {
     $.ajax({
       url: "libs/php/getCountryBordersFromJSON.php",
       type: "POST",
       dataType: "json",
       data: {
-        countryName: countryName,
+        countryCode: countryCode,
       },
       success: function (result) {
         if (result.status.name == "ok") {
@@ -84,7 +83,6 @@ const getCountryBorderFromCountryName = async (countryName) => {
       },
     });
   });
-  console.log(border);
   return border;
 };
 
@@ -108,7 +106,6 @@ const getCountryList = async () => {
       },
     });
   });
-  console.log(countryList);
   return countryList;
 };
 
@@ -247,6 +244,7 @@ const apiToHTML = (countryAPIData) => {
 const loaderFunction = async () => {
   // Get list of countries from JSON and populate Select -> Options from list
   const countryList = await getCountryList();
+  countryList.sort((a, b) => (a.name > b.name) ? 1 : -1);
   countryList.forEach((country) => {
     $("#country").append($("<option>", { value: country.code }).text(country.name));
   });
@@ -260,8 +258,8 @@ const loaderFunction = async () => {
   );
 
   // Get border details for Country from JSON and highlight country as selected in Select html element
-  countryObject.borderJSON = await getCountryBorderFromCountryName(
-    countryObject.countryDataFromGeoNames.countryName
+  countryObject.borderJSON = await getCountryBorderFromCountryCode(
+    countryObject.countryDataFromGeoNames.countryCode
   );
   $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
 
@@ -291,11 +289,11 @@ $("#country").change(async function () {
   countryObject = {};
 
   // Pull Country Name from Select list currently selected item
-  countryObject.countryName = $("#country").val();
+  countryObject.countryCode = $("#country").val();
 
   // Get Border details from JSON
-  countryObject.borderJSON = await getCountryBorderFromCountryName(
-    countryObject.countryName
+  countryObject.borderJSON = await getCountryBorderFromCountryCode(
+    countryObject.countryCode
   );
 
   // Create polyline for selected Country
@@ -303,7 +301,7 @@ $("#country").change(async function () {
 
   // Get All API Data
   countryObject.countryAPIData = await getAllAPIData(
-    countryObject.borderJSON.properties.iso_a2
+    countryObject.countryCode
   );
 
   // Populate HTML from API data
