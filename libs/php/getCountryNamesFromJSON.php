@@ -9,7 +9,7 @@
 	$decode = json_decode("$result");
   $countryNames = array();
   foreach ($decode->features as $value) {
-    array_push($countryNames, $value->properties->name);
+    array_push($countryNames, array("name"=>$value->properties->name, "code"=>$value->properties->iso_a2));
   };
 
 	$output['status']['code'] = "200";

@@ -55,6 +55,7 @@ const getCountryFromLoc = async (coords) => {
       },
     });
   });
+  console.log(countryCode);
   return countryCode;
 };
 
@@ -83,6 +84,7 @@ const getCountryBorderFromCountryName = async (countryName) => {
       },
     });
   });
+  console.log(border);
   return border;
 };
 
@@ -106,6 +108,7 @@ const getCountryList = async () => {
       },
     });
   });
+  console.log(countryList);
   return countryList;
 };
 
@@ -244,9 +247,8 @@ const apiToHTML = (countryAPIData) => {
 const loaderFunction = async () => {
   // Get list of countries from JSON and populate Select -> Options from list
   const countryList = await getCountryList();
-  countryList.sort();
   countryList.forEach((country) => {
-    $("#country").append($("<option>", { value: country }).text(country));
+    $("#country").append($("<option>", { value: country.code }).text(country.name));
   });
 
   // Get lat and long coords from device location
@@ -261,7 +263,7 @@ const loaderFunction = async () => {
   countryObject.borderJSON = await getCountryBorderFromCountryName(
     countryObject.countryDataFromGeoNames.countryName
   );
-  $("#country").val(countryObject.countryDataFromGeoNames.countryName);
+  $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
 
   // Use border details for Country to create polyline on map
   createBorder(countryObject.borderJSON);
