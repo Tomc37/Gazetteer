@@ -35,7 +35,7 @@ html, body, #map {
   top: 90px;
   left: 8px;
   z-index: 2;
-  width: 40px;
+  width: auto;
   height: auto;
 }
 
@@ -85,6 +85,7 @@ html, body, #map {
 .modal-dialog {
   pointer-events: all;
   margin: 0;
+  max-width: 600px;
 }
 
 .modal-header {
