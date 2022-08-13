@@ -241,7 +241,10 @@ const addMapMarkers = (coords) => {
     prefix: "fa",
   });
   countryMarkersMarkerCluster.addLayer(
-    L.marker([coords.latitude, coords.longitude], { icon: capitalMarker })
+    L.marker([coords.latitude, coords.longitude], { icon: capitalMarker }).bindTooltip(`Capital City: ${countryObject.countryAPIData.countryWeatherData.address}`, {
+      permanent: true,
+      direction: "right"
+    })
   );
   map.addLayer(countryMarkersMarkerCluster);
 };

@@ -84,6 +84,7 @@ html, body, #map {
 
 .modal-dialog {
   pointer-events: all;
+  margin: 0;
 }
 
 .modal-header {
@@ -205,6 +206,7 @@ tr {
   .modal {
     background-color: white;
     height: auto;
+    max-height: 550px;
     width: 300px;
     margin-left: -150px;
     margin-top: -250px;
