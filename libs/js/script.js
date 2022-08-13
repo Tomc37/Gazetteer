@@ -4,6 +4,9 @@ const map = L.map("map").setView([0, 0], 3);
 // Create LeafletJS FeatureGroup
 const countryMarkersFeatureGroup = L.featureGroup();
 
+// Create LeafletJS MarkerCluster
+const countryMarkersMarkerCluster = new L.markerClusterGroup();
+
 // Load in LeafletJS TileLayer
 L.tileLayer(
   "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=4e4765b2-fdfd-45d0-ba9a-bfe35596092d",
@@ -192,34 +195,58 @@ const getNewsData = async (countryCode) => {
         console.log(error);
         reject(JSON.stringify(error));
       },
-    })
-  })
+    });
+  });
   return newsData.articles;
-}
+};
 
 // Group API Function Calls for eventual loading into countryObject
 const getAllAPIData = async (countryCode) => {
   {
     const countryBasicData = await getCountryBasicData(countryCode);
     const countryWeatherData = await getWeatherData(countryBasicData.capital);
+    const capitalCoords = {
+      latitude: countryWeatherData.latitude,
+      longitude: countryWeatherData.longitude,
+    };
     const countryCovidData = await getCovidData(countryCode);
     let countryNewsData = await getNewsData(countryCode);
     const uniqueTitles = [];
-    countryNewsData = countryNewsData.filter(element => {
+    countryNewsData = countryNewsData.filter((element) => {
       const isDuplicate = uniqueTitles.includes(element.title);
       if (!isDuplicate) {
         uniqueTitles.push(element.title);
         return true;
       }
       return false;
-    })
+    });
     countryNewsData = countryNewsData.slice(0, 5);
-    return { countryBasicData, countryWeatherData, countryCovidData, countryNewsData };
+    return {
+      countryBasicData,
+      countryWeatherData,
+      countryCovidData,
+      countryNewsData,
+      capitalCoords,
+    };
   }
 };
 
+// Functions to add map markers for capital and landmarks
+const addMapMarkers = (coords) => {
+  countryMarkersMarkerCluster.clearLayers();
+  const capitalMarker = L.ExtraMarkers.icon({
+    icon: "fa-coffee",
+    markerColor: "yellow",
+    shape: "star",
+    prefix: "fa",
+  });
+  countryMarkersMarkerCluster.addLayer(
+    L.marker([coords.latitude, coords.longitude], { icon: capitalMarker })
+  );
+  map.addLayer(countryMarkersMarkerCluster);
+};
 
-const numberFormat = '0,0';
+const numberFormat = "0,0";
 const timeFormat = "00:00";
 // JQuery HTML Replacers
 const apiToHTML = (countryAPIData) => {
@@ -248,7 +275,9 @@ const apiToHTML = (countryAPIData) => {
     countryAPIData.countryWeatherData.currentConditions.conditions
   );
   $("#weather-time").html(
-    numeral(countryAPIData.countryWeatherData.currentConditions.datetime).format(timeFormat)
+    numeral(
+      countryAPIData.countryWeatherData.currentConditions.datetime
+    ).format(timeFormat)
   );
   $("#weather-temperature").html(
     `${countryAPIData.countryWeatherData.currentConditions.temp}C`
@@ -263,44 +292,40 @@ const apiToHTML = (countryAPIData) => {
   // Covid
   $("#covid-icon").attr("src", "libs/util/Images/covid.png");
   $("#covid-confirmed").html(
-    numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(numberFormat)
+    numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
+      numberFormat
+    )
   );
-  $("#covid-deaths").html(numeral(countryAPIData.countryCovidData.latest_data.deaths).format(numberFormat));
+  $("#covid-deaths").html(
+    numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
+      numberFormat
+    )
+  );
   $("#covid-recovered").html(
-    numeral(countryAPIData.countryCovidData.latest_data.recovered).format(numberFormat)
+    numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
+      numberFormat
+    )
   );
-  $("#covid-cases-today").html(numeral(countryAPIData.countryCovidData.today.confirmed).format(numberFormat));
-  $("#covid-deaths-today").html(numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat));
+  $("#covid-cases-today").html(
+    numeral(countryAPIData.countryCovidData.today.confirmed).format(
+      numberFormat
+    )
+  );
+  $("#covid-deaths-today").html(
+    numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
+  );
   // News
   $(".news-article-container").remove();
-  countryAPIData.countryNewsData.forEach((article => {
+  countryAPIData.countryNewsData.forEach((article) => {
     const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></div>`;
     $(".news-articles-container").append(newDiv);
-  }))
+  });
 };
 
-// Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
-const loaderFunction = async () => {
-  // Get list of countries from JSON and populate Select -> Options from list
-  const countryList = await getCountryList();
-  countryList.sort((a, b) => (a.name > b.name) ? 1 : -1);
-  countryList.forEach((country) => {
-    $("#country").append($("<option>", { value: country.code }).text(country.name));
-  });
-
-  // Get lat and long coords from device location
-  countryObject.coords = await getCoordsFromDeviceLocation();
-
-  // Get country data from Geonames from coords, languages, countryCode, countryName
-  countryObject.countryDataFromGeoNames = await getCountryFromLoc(
-    countryObject.coords
-  );
-
-  // Get border details for Country from JSON and highlight country as selected in Select html element
-  countryObject.borderJSON = await getCountryBorderFromCountryCode(
-    countryObject.countryDataFromGeoNames.countryCode
-  );
-  $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
+// Group common functions for loader and Select->Option Select
+const groupedFunctions = async (countryCode) => {
+  // Get border details for Country from JSON
+  countryObject.borderJSON = await getCountryBorderFromCountryCode(countryCode);
 
   // Use border details for Country to create polyline on map
   createBorder(countryObject.borderJSON);
@@ -312,6 +337,35 @@ const loaderFunction = async () => {
 
   // Populate HTML from API data
   apiToHTML(countryObject.countryAPIData);
+
+  // Add additional map markers
+  addMapMarkers(countryObject.countryAPIData.capitalCoords);
+  return countryObject;
+};
+
+// Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
+const loaderFunction = async () => {
+  // Get list of countries from JSON and populate Select -> Options from list
+  const countryList = await getCountryList();
+  countryList.sort((a, b) => (a.name > b.name ? 1 : -1));
+  countryList.forEach((country) => {
+    $("#country").append(
+      $("<option>", { value: country.code }).text(country.name)
+    );
+  });
+
+  // Get lat and long coords from device location
+  countryObject.coords = await getCoordsFromDeviceLocation();
+
+  // Get country data from Geonames from coords, languages, countryCode, countryName
+  countryObject.countryDataFromGeoNames = await getCountryFromLoc(
+    countryObject.coords
+  );
+
+  // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers
+  groupedFunctions(countryObject.countryDataFromGeoNames.countryCode);
+
+  $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
 
   // Test countryObject
   console.log(countryObject);
@@ -327,24 +381,8 @@ $("#country").change(async function () {
   // Clear countryObject
   countryObject = {};
 
-  // Pull Country Name from Select list currently selected item
-  countryObject.countryCode = $("#country").val();
-
-  // Get Border details from JSON
-  countryObject.borderJSON = await getCountryBorderFromCountryCode(
-    countryObject.countryCode
-  );
-
-  // Create polyline for selected Country
-  createBorder(countryObject.borderJSON);
-
-  // Get All API Data
-  countryObject.countryAPIData = await getAllAPIData(
-    countryObject.countryCode
-  );
-
-  // Populate HTML from API data
-  apiToHTML(countryObject.countryAPIData);
+  // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers from country code
+  groupedFunctions($("#country").val());
 
   // Test countryObject
   console.log(countryObject);
