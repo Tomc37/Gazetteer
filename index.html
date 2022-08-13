@@ -7,18 +7,10 @@
       name="viewport"
       content="width=device-width, height=device-height, initial-scale=1, shrink-to-fit=no"
     />
-    <link
-      href="libs/util/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="libs/util/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="libs/css/index.css" />
-    <link
-      rel="stylesheet"
-      href="libs/util/leaflet.css"
-    />
-    <script
-      src="libs/util/leaflet.js"
-    ></script>
+    <link rel="stylesheet" href="libs/util/leaflet.css" />
+    <script src="libs/util/leaflet.js"></script>
     <script src="libs/util/numeral.min.js"></script>
   </head>
   <body>
@@ -31,18 +23,24 @@
         data-bs-toggle="modal"
         data-bs-target="#stats-modal"
       ></button>
-      <div
+      <button
         class="button btn"
         id="weather-button"
         data-bs-toggle="modal"
         data-bs-target="#weather-modal"
-      ></div>
-      <div
+      ></button>
+      <button
         class="button btn"
         id="covid-button"
         data-bs-toggle="modal"
         data-bs-target="#covid-modal"
-      ></div>
+      ></button>
+      <button
+        class="button btn"
+        id="news-button"
+        data-bs-toggle="modal"
+        data-bs-target="#news-modal"
+      ></button>
     </div>
     <div class="modal-container">
       <div class="modal fade top-50 start-50" id="stats-modal">
@@ -149,7 +147,7 @@
             <h5>Covid Information</h5>
           </div>
           <div class="modal-body">
-            <img alt="covid-icon" id="covid-icon">
+            <img alt="covid-icon" id="covid-icon" />
             <div class="table-container">
               <table>
                 <tbody>
@@ -188,20 +186,33 @@
           </div>
         </div>
       </div>
+      <div class="modal fade top-50 start-50" id="news-modal">
+        <div class="modal-dialog" id="news-modal-dialog">
+          <div class="modal-header">
+            <h3 id="news-modal-header">LATEST NEWS</h3>
+          </div>
+          <div class="modal-body">
+            <div class="news-articles-container"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <script
       type="application/javascript"
       src="libs/js/jquery-2.2.3.min.js"
     ></script>
-    <script
-      src="libs/util/bootstrap.bundle.min.js"
-    ></script>
-    <script
-      src="libs/util/popper.min.js"
-    ></script>
-    <script
-      src="libs/util/bootstrap.min.js"
-    ></script>
+    <script src="libs/util/bootstrap.bundle.min.js"></script>
+    <script src="libs/util/popper.min.js"></script>
+    <script src="libs/util/bootstrap.min.js"></script>
     <script type="application/javascript" src="libs/js/script.js"></script>
   </body>
 </html>

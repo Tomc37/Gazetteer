@@ -40,8 +40,8 @@ html, body, #map {
 }
 
 .button {
-  height: 50px;
-  width: 50px;
+  height: 60px;
+  width: 60px;
   border-radius: 100%;
   margin-bottom: 1rem;
   background-color: black;
@@ -67,12 +67,23 @@ html, body, #map {
   background-size: cover;
 }
 
+#news-button {
+  background-image: url("../util/Images/news.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .modal {
   background-color: white;
   height: auto;
+  max-height: 600px;
   width: 600px;
   margin-left: -300px;
   margin-top: -300px;
+}
+
+.modal-dialog {
+  pointer-events: all;
 }
 
 .modal-header {
@@ -148,6 +159,48 @@ tr {
   padding: 3px;
 }
 
+#news-modal-header {
+  font-size: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: red;
+  color: white;
+  width: 100%;
+  height: 5rem;
+}
+
+.news-articles-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.news-article-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  border: solid 1px rgb(211, 208, 208);
+  padding: 6px;
+}
+
+.news-article-container:hover {
+  text-decoration: underline;
+}
+
+.news-article-container img {
+  height: 120px;
+  width: 120px;
+  object-fit: cover;
+}
+
+.news-article-container h5 {
+  margin-left: 1rem;
+  color: rgba(0, 89, 255, 0.945);
+}
+
 @media screen and (max-width: 400px) {
   .modal {
     background-color: white;
@@ -155,6 +208,11 @@ tr {
     width: 300px;
     margin-left: -150px;
     margin-top: -250px;
+  }
+
+  .button {
+    width: 40px;
+    height: 40px;
   }
 
   #stats-flag {
@@ -182,5 +240,23 @@ tr {
 
   tr {
     font-size: .75rem;
+  }
+
+  .news-article-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .news-article-container img {
+    height: auto;
+    max-height: 159px;
+    width: 100%;
+    object-fit: cover;
+  }
+  
+  .news-article-container h5 {
+    margin-top: .75rem;
+    color: rgba(0, 89, 255, 0.945);
   }
 }

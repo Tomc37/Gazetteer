@@ -175,13 +175,46 @@ const getCovidData = async (countryCode) => {
   return covidData.data;
 };
 
+// News data from https://newsapi.org/v2
+const getNewsData = async (countryCode) => {
+  const newsData = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: `https://api.newscatcherapi.com/v2/latest_headlines?countries=${countryCode}&lang=en&ranked_only=true`,
+      headers: {
+        "x-api-key": "cCk3xL_PBnWAWgu-zE7d6vTI6rSiFoSGcSbhCP3O6AU",
+      },
+      type: "GET",
+      dataType: "JSON",
+      success: function (result) {
+        resolve(result);
+      },
+      error: function (error) {
+        console.log(error);
+        reject(JSON.stringify(error));
+      },
+    })
+  })
+  return newsData.articles;
+}
+
 // Group API Function Calls for eventual loading into countryObject
 const getAllAPIData = async (countryCode) => {
   {
     const countryBasicData = await getCountryBasicData(countryCode);
     const countryWeatherData = await getWeatherData(countryBasicData.capital);
     const countryCovidData = await getCovidData(countryCode);
-    return { countryBasicData, countryWeatherData, countryCovidData };
+    let countryNewsData = await getNewsData(countryCode);
+    const uniqueTitles = [];
+    countryNewsData = countryNewsData.filter(element => {
+      const isDuplicate = uniqueTitles.includes(element.title);
+      if (!isDuplicate) {
+        uniqueTitles.push(element.title);
+        return true;
+      }
+      return false;
+    })
+    countryNewsData = countryNewsData.slice(0, 5);
+    return { countryBasicData, countryWeatherData, countryCovidData, countryNewsData };
   }
 };
 
@@ -238,6 +271,12 @@ const apiToHTML = (countryAPIData) => {
   );
   $("#covid-cases-today").html(numeral(countryAPIData.countryCovidData.today.confirmed).format(numberFormat));
   $("#covid-deaths-today").html(numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat));
+  // News
+  $(".news-article-container").remove();
+  countryAPIData.countryNewsData.forEach((article => {
+    const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></div>`;
+    $(".news-articles-container").append(newDiv);
+  }))
 };
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
@@ -313,15 +352,13 @@ $("#country").change(async function () {
 
 // Remove modal on clicks
 $("#country").click(function () {
-  $("#stats-modal, #covid-modal, #weather-modal").modal("hide");
+  $("#stats-modal, #covid-modal, #weather-modal, #news-modal").modal("hide");
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });
 
 $("#map").click(function () {
-  $("#stats-modal").modal("hide");
-  $("#covid-modal").modal("hide");
-  $("#weather-modal").modal("hide");
+  $("#stats-modal, #covid-modal, #weather-modal, #news-modal").modal("hide");
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });
