@@ -236,13 +236,13 @@ const addMapMarkers = (coords) => {
   countryMarkersMarkerCluster.clearLayers();
   const capitalMarker = L.ExtraMarkers.icon({
     icon: "fa-coffee",
-    markerColor: "yellow",
+    markerColor: "red",
     shape: "star",
     prefix: "fa",
   });
   countryMarkersMarkerCluster.addLayer(
     L.marker([coords.latitude, coords.longitude], { icon: capitalMarker }).bindTooltip(`Capital City: ${countryObject.countryAPIData.countryWeatherData.address}`, {
-      permanent: true,
+      permanent: false,
       direction: "right"
     })
   );

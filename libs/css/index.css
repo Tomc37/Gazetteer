@@ -17,6 +17,10 @@ html, body, #map {
   margin-left: 6px;
 }
 
+.leaflet-tooltip {
+  padding: 2px !important;
+}
+
 #map {
   z-index: 1;
 }
