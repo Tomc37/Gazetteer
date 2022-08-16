@@ -200,11 +200,53 @@ const getNewsData = async (countryCode) => {
   return newsData.articles;
 };
 
+// City coords for map markers
+const getCityCoords = async () => {
+  const bounds = await countryMarkersFeatureGroup.getBounds();
+  const cityCoords = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: `http://api.geonames.org/citiesJSON?north=${bounds._northEast.lat}&south=${bounds._southWest.lat}&east=${bounds._northEast.lng}&west=${bounds._southWest.lng}&lang=en&username=severion&maxRows=10`,
+      type: "GET",
+      dataType: "JSON",
+      success: function (result) {
+        resolve(result);
+      },
+      error: function (error) {
+        console.log(error);
+        reject(JSON.stringify(error));
+      },
+    });
+  });
+  return cityCoords.geonames;
+};
+
+// Landmark coords for map markers:
+const getLandmarkCoords = async () => {
+  const bounds = await countryMarkersFeatureGroup.getBounds();
+  const landmarkCoords = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: `http://api.geonames.org/wikipediaBoundingBoxJSON?north=${bounds._northEast.lat}&south=${bounds._southWest.lat}&east=${bounds._northEast.lng}&west=${bounds._southWest.lng}&username=severion&maxRows=80`,
+      type: "GET",
+      dataType: "JSON",
+      success: function (result) {
+        resolve(result);
+      },
+      error: function (error) {
+        console.log(error);
+        reject(JSON.stringify(error));
+      },
+    });
+  });
+  return landmarkCoords.geonames;
+};
+
 // Group API Function Calls for eventual loading into countryObject
 const getAllAPIData = async (countryCode) => {
   {
     const countryBasicData = await getCountryBasicData(countryCode);
-    const countryWeatherData = await getWeatherData(countryBasicData.capital[0]);
+    const countryWeatherData = await getWeatherData(
+      countryBasicData.capital[0]
+    );
     const capitalCoords = {
       latitude: countryWeatherData.latitude,
       longitude: countryWeatherData.longitude,
@@ -221,36 +263,91 @@ const getAllAPIData = async (countryCode) => {
       return false;
     });
     countryNewsData = countryNewsData.slice(0, 5);
+    let cityCoords = await getCityCoords();
+    if (cityCoords) {
+      cityCoords = cityCoords.filter(
+        (city) =>
+          city.countrycode == countryCode &&
+          city.name !== countryBasicData.capital[0]
+      );
+    }
+    let landmarkCoords = await getLandmarkCoords();
+    if (landmarkCoords) {
+      landmarkCoords = landmarkCoords.filter(
+        (landmark) =>
+          landmark.feature == "landmark" && landmark.countryCode == countryCode
+      );
+    }
     return {
       countryBasicData,
       countryWeatherData,
       countryCovidData,
       countryNewsData,
       capitalCoords,
+      cityCoords,
+      landmarkCoords,
     };
   }
 };
 
 // Functions to add map markers for capital and landmarks
-const addMapMarkers = (coords) => {
+const addMapMarkers = (capitalCoords, cityCoords, landmarkCoords) => {
   countryMarkersMarkerCluster.clearLayers();
   const capitalMarker = L.ExtraMarkers.icon({
-    icon: "fa-coffee",
     markerColor: "red",
-    shape: "star",
+    shape: "circle",
+    prefix: "fa",
+    innerHTML: "<img src='../util/Images/city.png />'",
+  });
+  const cityMarker = L.ExtraMarkers.icon({
+    markerColor: "yellow",
+    shape: "circle",
+    prefix: "fa",
+  });
+  const landmarkMarker = L.ExtraMarkers.icon({
+    markerColor: "green",
+    shape: "circle",
     prefix: "fa",
   });
   countryMarkersMarkerCluster.addLayer(
-    L.marker([coords.latitude, coords.longitude], { icon: capitalMarker }).bindTooltip(`Capital City: ${countryObject.countryAPIData.countryWeatherData.address}`, {
-      permanent: false,
-      direction: "right"
-    })
+    L.marker([capitalCoords.latitude, capitalCoords.longitude], {
+      icon: capitalMarker,
+    }).bindTooltip(
+      `Capital City: ${countryObject.countryAPIData.countryWeatherData.address}`,
+      {
+        permanent: false,
+        direction: "right",
+      }
+    )
   );
+  if (cityCoords) {
+    cityCoords.forEach((city) => {
+      countryMarkersMarkerCluster.addLayer(
+        L.marker([city.lat, city.lng], {
+          icon: cityMarker,
+        }).bindTooltip(`City: ${city.name}`, {
+          permanent: false,
+          direction: "right",
+        })
+      );
+    });
+  }
+  if (landmarkCoords) {
+    landmarkCoords.forEach((landmark) => {
+      countryMarkersMarkerCluster.addLayer(
+        L.marker([landmark.lat, landmark.lng], {
+          icon: landmarkMarker,
+        }).bindTooltip(`Landmark: ${landmark.title}`, {
+          permanent: false,
+          direction: "right",
+        })
+      );
+    });
+  }
   map.addLayer(countryMarkersMarkerCluster);
 };
 
 const numberFormat = "0,0";
-const timeFormat = "00:00";
 // JQuery HTML Replacers
 const apiToHTML = (countryAPIData) => {
   // Basic Info
@@ -262,7 +359,7 @@ const apiToHTML = (countryAPIData) => {
   );
   let capital = "";
   capital = countryAPIData.countryBasicData.capital[0];
-  for (i=1; i<countryAPIData.countryBasicData.capital.length; i++) {
+  for (i = 1; i < countryAPIData.countryBasicData.capital.length; i++) {
     capital += `, ${countryAPIData.countryBasicData.capital[i]}`;
   }
   $("#capital").html(capital);
@@ -283,9 +380,7 @@ const apiToHTML = (countryAPIData) => {
     countryAPIData.countryWeatherData.currentConditions.conditions
   );
   $("#weather-time").html(
-    numeral(
-      countryAPIData.countryWeatherData.currentConditions.datetime
-    ).format(timeFormat)
+    numeral(countryAPIData.countryWeatherData.currentConditions.datetime)
   );
   $("#weather-temperature").html(
     `${countryAPIData.countryWeatherData.currentConditions.temp}C`
@@ -339,15 +434,17 @@ const groupedFunctions = async (countryCode) => {
   createBorder(countryObject.borderJSON);
 
   // Get All API Data
-  countryObject.countryAPIData = await getAllAPIData(
-    countryCode
-  );
+  countryObject.countryAPIData = await getAllAPIData(countryCode);
 
   // Populate HTML from API data
   apiToHTML(countryObject.countryAPIData);
 
   // Add additional map markers
-  addMapMarkers(countryObject.countryAPIData.capitalCoords);
+  addMapMarkers(
+    countryObject.countryAPIData.capitalCoords,
+    countryObject.countryAPIData.cityCoords,
+    countryObject.countryAPIData.landmarkCoords
+  );
   return countryObject;
 };
 
@@ -371,7 +468,7 @@ const loaderFunction = async () => {
   );
 
   // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers
-  groupedFunctions(countryObject.countryDataFromGeoNames.countryCode);
+  await groupedFunctions(countryObject.countryDataFromGeoNames.countryCode);
 
   $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
 
@@ -390,7 +487,7 @@ $("#country").change(async function () {
   countryObject = {};
 
   // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers from country code
-  groupedFunctions($("#country").val());
+  await groupedFunctions($("#country").val());
 
   // Test countryObject
   console.log(countryObject);
