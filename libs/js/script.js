@@ -205,19 +205,27 @@ const getCityCoords = async () => {
   const bounds = await countryMarkersFeatureGroup.getBounds();
   const cityCoords = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `http://api.geonames.org/citiesJSON?north=${bounds._northEast.lat}&south=${bounds._southWest.lat}&east=${bounds._northEast.lng}&west=${bounds._southWest.lng}&lang=en&username=severion&maxRows=10`,
-      type: "GET",
-      dataType: "JSON",
+      url: "libs/php/getCitiesFromGeonames.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        north: bounds._northEast.lat,
+        south: bounds._southWest.lat,
+        east: bounds._northEast.lng,
+        west: bounds._southWest.lng
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return cityCoords.geonames;
+  return cityCoords.data.geonames;
 };
 
 // Landmark coords for map markers:
@@ -225,19 +233,27 @@ const getLandmarkCoords = async () => {
   const bounds = await countryMarkersFeatureGroup.getBounds();
   const landmarkCoords = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `http://api.geonames.org/wikipediaBoundingBoxJSON?north=${bounds._northEast.lat}&south=${bounds._southWest.lat}&east=${bounds._northEast.lng}&west=${bounds._southWest.lng}&username=severion&maxRows=80`,
-      type: "GET",
-      dataType: "JSON",
+      url: "libs/php/getLandmarksFromGeonames.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        north: bounds._northEast.lat,
+        south: bounds._southWest.lat,
+        east: bounds._northEast.lng,
+        west: bounds._southWest.lng
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
-    });
+    })
   });
-  return landmarkCoords.geonames;
+  return landmarkCoords.data.geonames;
 };
 
 // Group API Function Calls for eventual loading into countryObject
