@@ -443,6 +443,7 @@ const apiToHTML = (countryAPIData) => {
 
 // Group common functions for loader and Select->Option Select
 const groupedFunctions = async (countryCode) => {
+  $("#loading").show();
   // Get border details for Country from JSON
   countryObject.borderJSON = await getCountryBorderFromCountryCode(countryCode);
 
@@ -461,6 +462,7 @@ const groupedFunctions = async (countryCode) => {
     countryObject.countryAPIData.cityCoords,
     countryObject.countryAPIData.landmarkCoords
   );
+  $("#loading").hide();
   return countryObject;
 };
 
@@ -488,8 +490,6 @@ const loaderFunction = async () => {
 
   $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
 
-  // Test countryObject
-  console.log(countryObject);
 };
 
 // JQuery Document.Ready function for page load
@@ -505,8 +505,6 @@ $("#country").change(async function () {
   // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers from country code
   await groupedFunctions($("#country").val());
 
-  // Test countryObject
-  console.log(countryObject);
 });
 
 // Remove modal on clicks

@@ -18,6 +18,9 @@
     <script src="libs/util/leaflet.markercluster-src.js"></script>
   </head>
   <body>
+    <div id="loading">
+      <img id="loading-image" src="libs/util/Images/loading-25.gif" alt="Loading..." />
+    </div>
     <div id="map"></div>
     <select name="country" id="country"></select>
     <div id="button-container">
@@ -218,5 +221,10 @@
     <script src="libs/util/popper.min.js"></script>
     <script src="libs/util/bootstrap.min.js"></script>
     <script type="application/javascript" src="libs/js/script.js"></script>
+    <script>
+      $(window).on('load', function () {
+        $('#loading').hide();
+      }) 
+    </script>
   </body>
 </html>
