@@ -204,7 +204,7 @@ const getNewsData = async (countryCode) => {
 const getAllAPIData = async (countryCode) => {
   {
     const countryBasicData = await getCountryBasicData(countryCode);
-    const countryWeatherData = await getWeatherData(countryBasicData.capital);
+    const countryWeatherData = await getWeatherData(countryBasicData.capital[0]);
     const capitalCoords = {
       latitude: countryWeatherData.latitude,
       longitude: countryWeatherData.longitude,
@@ -260,7 +260,12 @@ const apiToHTML = (countryAPIData) => {
   $("#population").html(
     numeral(countryAPIData.countryBasicData.population).format(numberFormat)
   );
-  $("#capital").html(countryAPIData.countryBasicData.capital);
+  let capital = "";
+  capital = countryAPIData.countryBasicData.capital[0];
+  for (i=1; i<countryAPIData.countryBasicData.capital.length; i++) {
+    capital += `, ${countryAPIData.countryBasicData.capital[i]}`;
+  }
+  $("#capital").html(capital);
   const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
   $("#currency").html(
     `${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`
@@ -335,7 +340,7 @@ const groupedFunctions = async (countryCode) => {
 
   // Get All API Data
   countryObject.countryAPIData = await getAllAPIData(
-    countryObject.borderJSON.properties.iso_a2
+    countryCode
   );
 
   // Populate HTML from API data
