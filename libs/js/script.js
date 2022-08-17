@@ -284,7 +284,7 @@ const getAllAPIData = async (countryCode) => {
       latitude: countryWeatherData.latitude,
       longitude: countryWeatherData.longitude,
     };
-    // const countryCovidData = await getCovidData(countryCode);
+    const countryCovidData = await getCovidData(countryCode);
     let countryNewsData = await getNewsData(countryCode);
     const uniqueTitles = [];
     countryNewsData = countryNewsData.filter((element) => {
@@ -314,7 +314,7 @@ const getAllAPIData = async (countryCode) => {
     return {
       countryBasicData,
       countryWeatherData,
-      // countryCovidData,
+      countryCovidData,
       countryNewsData,
       capitalCoords,
       cityCoords,
@@ -426,30 +426,30 @@ const apiToHTML = (countryAPIData) => {
   );
   $("#weather-forecast").html(countryAPIData.countryWeatherData.description);
   // Covid
-  // $("#covid-icon").attr("src", "libs/util/Images/covid.png");
-  // $("#covid-confirmed").html(
-  //   numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-deaths").html(
-  //   numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-recovered").html(
-  //   numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-cases-today").html(
-  //   numeral(countryAPIData.countryCovidData.today.confirmed).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-deaths-today").html(
-  //   numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
-  // );
+  $("#covid-icon").attr("src", "libs/util/Images/covid.png");
+  $("#covid-confirmed").html(
+    numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
+      numberFormat
+    )
+  );
+  $("#covid-deaths").html(
+    numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
+      numberFormat
+    )
+  );
+  $("#covid-recovered").html(
+    numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
+      numberFormat
+    )
+  );
+  $("#covid-cases-today").html(
+    numeral(countryAPIData.countryCovidData.today.confirmed).format(
+      numberFormat
+    )
+  );
+  $("#covid-deaths-today").html(
+    numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
+  );
   // News
   $(".news-article-container").remove();
   countryAPIData.countryNewsData.forEach((article) => {
