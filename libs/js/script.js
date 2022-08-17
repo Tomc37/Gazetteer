@@ -191,7 +191,7 @@ const getCovidData = async (countryCode) => {
     });
   });
   console.log(covidData);
-  return covidData.data;
+  return covidData.data.data;
 };
 
 // News data from https://newsapi.org/v2
