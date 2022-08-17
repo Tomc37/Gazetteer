@@ -293,4 +293,10 @@ tr {
     margin-top: .75rem;
     color: rgba(0, 89, 255, 0.945);
   }
+
+  .leaflet-touch .leaflet-bar button {
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+  }
 }
