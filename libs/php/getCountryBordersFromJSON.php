@@ -7,7 +7,7 @@
 
   $countryCode = $_REQUEST['countryCode'];
    
-  $result = file_get_contents("..\util\countryBorders.geo.json");
+  $result = file_get_contents("../util/countryBorders.geo.json");
 	$decode = json_decode("$result");
 	$features = $decode->features;
 	$filtered = array_values(array_filter($features, function($value) use ($countryCode) {

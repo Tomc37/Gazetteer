@@ -125,56 +125,72 @@ function createBorder(geoJSON) {
 const getCountryBasicData = async (countryCode) => {
   const countryBasicData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
-      type: "GET",
+      url: "libs/php/getBasicCountryData.php",
+      type: "POST",
       dataType: "JSON",
+      data: {
+        countryCode: countryCode
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return countryBasicData[0];
+  return countryBasicData.data[0];
 };
 
 // Weather data from https://www.visualcrossing.com/
 const getWeatherData = async (cityName) => {
   const countryWeatherData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${cityName}?unitGroup=metric&key=ULZ8VH9ZR2MR8HA5M4C4TT3JP&contentType=json`,
-      type: "GET",
+      url: "libs/php/getWeatherData.php",
+      type: "POST",
       dataType: "JSON",
+      data: {
+        cityName: cityName,
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return countryWeatherData;
+  return countryWeatherData.data;
 };
 
 // Covid data from https://corona-api.com/
 const getCovidData = async (countryCode) => {
   const covidData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://corona-api.com/countries/${countryCode}`,
-      type: "GET",
-      dataType: "JSON",
+      url: "libs/php/getCovidData.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        countryCode: countryCode,
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
+  console.log(covidData);
   return covidData.data;
 };
 
@@ -182,22 +198,24 @@ const getCovidData = async (countryCode) => {
 const getNewsData = async (countryCode) => {
   const newsData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://api.newscatcherapi.com/v2/latest_headlines?countries=${countryCode}&lang=en&ranked_only=true`,
-      headers: {
-        "x-api-key": "cCk3xL_PBnWAWgu-zE7d6vTI6rSiFoSGcSbhCP3O6AU",
-      },
-      type: "GET",
+      url: "libs/php/getNewsData.php",
+      type: "POST",
       dataType: "JSON",
+      data: {
+        countryCode: countryCode,
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return newsData.articles;
+  return newsData.data.articles;
 };
 
 // City coords for map markers
