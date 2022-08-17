@@ -125,79 +125,96 @@ function createBorder(geoJSON) {
 const getCountryBasicData = async (countryCode) => {
   const countryBasicData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://restcountries.com/v3.1/alpha/${countryCode}`,
-      type: "GET",
+      url: "libs/php/getBasicCountryData.php",
+      type: "POST",
       dataType: "JSON",
+      data: {
+        countryCode: countryCode,
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return countryBasicData[0];
+  return countryBasicData.data[0];
 };
 
 // Weather data from https://www.visualcrossing.com/
 const getWeatherData = async (cityName) => {
   const countryWeatherData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${cityName}?unitGroup=metric&key=ULZ8VH9ZR2MR8HA5M4C4TT3JP&contentType=json`,
-      type: "GET",
+      url: "libs/php/getWeatherData.php",
+      type: "POST",
       dataType: "JSON",
+      data: {
+        cityName: cityName,
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return countryWeatherData;
+  return countryWeatherData.data;
 };
 
 // Covid data from https://corona-api.com/
 const getCovidData = async (countryCode) => {
   const covidData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://corona-api.com/countries/${countryCode}`,
-      type: "GET",
-      dataType: "JSON",
+      url: "libs/php/getCovidData.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        countryCode: countryCode,
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return covidData.data;
+  return covidData.data.data;
 };
 
 // News data from https://newsapi.org/v2
 const getNewsData = async (countryCode) => {
   const newsData = await new Promise((resolve, reject) => {
     $.ajax({
-      url: `https://api.newscatcherapi.com/v2/latest_headlines?countries=${countryCode}&lang=en&ranked_only=true`,
-      headers: {
-        "x-api-key": "cCk3xL_PBnWAWgu-zE7d6vTI6rSiFoSGcSbhCP3O6AU",
-      },
-      type: "GET",
+      url: "libs/php/getNewsData.php",
+      type: "POST",
       dataType: "JSON",
+      data: {
+        countryCode: countryCode,
+      },
       success: function (result) {
         resolve(result);
       },
-      error: function (error) {
-        console.log(error);
-        reject(JSON.stringify(error));
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
       },
     });
   });
-  return newsData.articles;
+  return newsData.data.articles;
 };
 
 // City coords for map markers
@@ -212,7 +229,7 @@ const getCityCoords = async () => {
         north: bounds._northEast.lat,
         south: bounds._southWest.lat,
         east: bounds._northEast.lng,
-        west: bounds._southWest.lng
+        west: bounds._southWest.lng,
       },
       success: function (result) {
         resolve(result);
@@ -240,7 +257,7 @@ const getLandmarkCoords = async () => {
         north: bounds._northEast.lat,
         south: bounds._southWest.lat,
         east: bounds._northEast.lng,
-        west: bounds._southWest.lng
+        west: bounds._southWest.lng,
       },
       success: function (result) {
         resolve(result);
@@ -251,7 +268,7 @@ const getLandmarkCoords = async () => {
         console.log(JSON.stringify(errorThrown));
         reject(JSON.stringify(errorThrown));
       },
-    })
+    });
   });
   return landmarkCoords.data.geonames;
 };
@@ -468,6 +485,34 @@ const groupedFunctions = async (countryCode) => {
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
 const loaderFunction = async () => {
+  //Add easybuttons
+L.easyButton("<i class='fa fa-info' style='font-size:18px;color:blue'>", function (btn, map) {
+  $("#stats-modal").modal("toggle")
+  $("#weather-modal").modal("hide")
+  $("#covid-modal").modal("hide")
+  $("#news-modal").modal("hide")
+}).addTo(map);
+
+L.easyButton("<i class='fa fa-sun' style='font-size:18px;color:orange'>", function (btn, map) {
+  $("#weather-modal").modal("toggle")
+  $("#stats-modal").modal("hide")
+  $("#covid-modal").modal("hide")
+  $("#news-modal").modal("hide")
+}).addTo(map);
+
+L.easyButton("<i class='fa fa-virus' style='font-size:18px;color:red'>", function (btn, map) {
+  $("#covid-modal").modal("toggle")
+  $("#weather-modal").modal("hide")
+  $("#stats-modal").modal("hide")
+  $("#news-modal").modal("hide")
+}).addTo(map);
+
+L.easyButton("<i class='fa fa-newspaper' style='font-size:18px;color:black'>", function (btn, map) {
+  $("#news-modal").modal("toggle")
+  $("#weather-modal").modal("hide")
+  $("#covid-modal").modal("hide")
+  $("#stats-modal").modal("hide")
+}).addTo(map);
   // Get list of countries from JSON and populate Select -> Options from list
   const countryList = await getCountryList();
   countryList.sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -489,7 +534,6 @@ const loaderFunction = async () => {
   await groupedFunctions(countryObject.countryDataFromGeoNames.countryCode);
 
   $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
-
 };
 
 // JQuery Document.Ready function for page load
@@ -504,7 +548,6 @@ $("#country").change(async function () {
 
   // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers from country code
   await groupedFunctions($("#country").val());
-
 });
 
 // Remove modal on clicks
