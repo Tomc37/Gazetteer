@@ -13,11 +13,13 @@
     <link rel="stylesheet" href="libs/util/leaflet.extra-markers.min.css" />
     <link rel="stylesheet" href="libs/util/MarkerCluster.Default.css"/>
     <link rel="stylesheet" href="libs/util/easy-button.css"/>
+    <link rel="stylesheet" href="libs/util/all.css"/>
     <script src="libs/util/leaflet.js"></script>
     <script src="libs/util/numeral.min.js"></script>
     <script src="libs/util/leaflet.extra-markers.min.js"></script>
     <script src="libs/util/leaflet.markercluster-src.js"></script>
     <script src="libs/util/easy-button.js"></script>
+    <script src="libs/util/all.js"></script>
   </head>
   <body>
     <div id="loading">
@@ -25,31 +27,6 @@
     </div>
     <div id="map"></div>
     <select name="country" id="country"></select>
-    <div id="button-container">
-      <button
-        class="button btn"
-        id="stats-button"
-        data-bs-toggle="modal"
-        data-bs-target="#stats-modal"
-      ></button>
-      <button
-        class="button btn"
-        id="weather-button"
-        data-bs-toggle="modal"
-        data-bs-target="#weather-modal"
-      ></button>
-      <button
-        class="button btn"
-        id="covid-button"
-        data-bs-toggle="modal"
-        data-bs-target="#covid-modal"
-      ></button>
-      <button
-        class="button btn"
-        id="news-button"
-        data-bs-toggle="modal"
-        data-bs-target="#news-modal"
-      ></button>
     </div>
     <div class="modal-container">
       <div class="modal fade top-50 start-50" id="stats-modal">

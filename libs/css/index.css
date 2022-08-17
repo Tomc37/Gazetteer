@@ -42,6 +42,12 @@ html, body, #map {
   padding: 2px !important;
 }
 
+.leaflet-touch .leaflet-bar button {
+  width: 42px !important;
+  height: 42px !important;
+  line-height: 42px !important;
+}
+
 #map {
   z-index: 1;
 }
@@ -73,7 +79,7 @@ html, body, #map {
   border: solid white 3px;
 }
 
-#stats-button {
+.info {
   background-image: url("../util/Images/stats.png");
   background-repeat: no-repeat;
   background-size: cover;
