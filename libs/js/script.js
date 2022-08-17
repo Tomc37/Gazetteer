@@ -330,7 +330,6 @@ const addMapMarkers = (capitalCoords, cityCoords, landmarkCoords) => {
     markerColor: "red",
     shape: "circle",
     prefix: "fa",
-    innerHTML: "<img src='../util/Images/city.png />'",
   });
   const cityMarker = L.ExtraMarkers.icon({
     markerColor: "yellow",
@@ -453,7 +452,7 @@ const apiToHTML = (countryAPIData) => {
   // News
   $(".news-article-container").remove();
   countryAPIData.countryNewsData.forEach((article) => {
-    const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></div>`;
+    const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></a>`;
     $(".news-articles-container").append(newDiv);
   });
 };
