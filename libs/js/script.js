@@ -190,7 +190,6 @@ const getCovidData = async (countryCode) => {
       },
     });
   });
-  console.log(covidData);
   return covidData.data.data;
 };
 
