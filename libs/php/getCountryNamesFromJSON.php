@@ -5,7 +5,7 @@
 
 	$executionStartTime = microtime(true);
 
-  $result = file_get_contents("https://thomascockerill.co.uk/project1/libs/util/countryBorders.geo.json");
+  $result = file_get_contents("../util/countryBorders.geo.json");
 	$decode = json_decode("$result");
   $countryNames = array();
   foreach ($decode->features as $value) {
