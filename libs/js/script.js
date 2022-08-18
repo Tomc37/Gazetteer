@@ -330,7 +330,6 @@ const addMapMarkers = (capitalCoords, cityCoords, landmarkCoords) => {
     markerColor: "red",
     shape: "circle",
     prefix: "fa",
-    innerHTML: "<img src='../util/Images/city.png />'",
   });
   const cityMarker = L.ExtraMarkers.icon({
     markerColor: "yellow",
@@ -453,7 +452,7 @@ const apiToHTML = (countryAPIData) => {
   // News
   $(".news-article-container").remove();
   countryAPIData.countryNewsData.forEach((article) => {
-    const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></div>`;
+    const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></a>`;
     $(".news-articles-container").append(newDiv);
   });
 };
@@ -485,34 +484,6 @@ const groupedFunctions = async (countryCode) => {
 
 // Define single function to run in doc.ready, doc.ready cannot be async and async calls needed.
 const loaderFunction = async () => {
-  //Add easybuttons
-L.easyButton("<i class='fa fa-info' style='font-size:18px;color:blue'>", function (btn, map) {
-  $("#stats-modal").modal("toggle")
-  $("#weather-modal").modal("hide")
-  $("#covid-modal").modal("hide")
-  $("#news-modal").modal("hide")
-}).addTo(map);
-
-L.easyButton("<i class='fa fa-sun' style='font-size:18px;color:orange'>", function (btn, map) {
-  $("#weather-modal").modal("toggle")
-  $("#stats-modal").modal("hide")
-  $("#covid-modal").modal("hide")
-  $("#news-modal").modal("hide")
-}).addTo(map);
-
-L.easyButton("<i class='fa fa-virus' style='font-size:18px;color:red'>", function (btn, map) {
-  $("#covid-modal").modal("toggle")
-  $("#weather-modal").modal("hide")
-  $("#stats-modal").modal("hide")
-  $("#news-modal").modal("hide")
-}).addTo(map);
-
-L.easyButton("<i class='fa fa-newspaper' style='font-size:18px;color:black'>", function (btn, map) {
-  $("#news-modal").modal("toggle")
-  $("#weather-modal").modal("hide")
-  $("#covid-modal").modal("hide")
-  $("#stats-modal").modal("hide")
-}).addTo(map);
   // Get list of countries from JSON and populate Select -> Options from list
   const countryList = await getCountryList();
   countryList.sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -538,6 +509,47 @@ L.easyButton("<i class='fa fa-newspaper' style='font-size:18px;color:black'>", f
 
 // JQuery Document.Ready function for page load
 $(function () {
+  //Add easybuttons
+  L.easyButton(
+    "<i class='fa fa-info' style='font-size:18px;color:blue'>",
+    function (btn, map) {
+      $("#stats-modal").modal("toggle");
+      $("#weather-modal").modal("hide");
+      $("#covid-modal").modal("hide");
+      $("#news-modal").modal("hide");
+    }
+  ).addTo(map);
+
+  L.easyButton(
+    "<i class='fa fa-sun' style='font-size:18px;color:orange'>",
+    function (btn, map) {
+      $("#weather-modal").modal("toggle");
+      $("#stats-modal").modal("hide");
+      $("#covid-modal").modal("hide");
+      $("#news-modal").modal("hide");
+    }
+  ).addTo(map);
+
+  L.easyButton(
+    "<i class='fa fa-virus' style='font-size:18px;color:red'>",
+    function (btn, map) {
+      $("#covid-modal").modal("toggle");
+      $("#weather-modal").modal("hide");
+      $("#stats-modal").modal("hide");
+      $("#news-modal").modal("hide");
+    }
+  ).addTo(map);
+
+  L.easyButton(
+    "<i class='fa fa-newspaper' style='font-size:18px;color:black'>",
+    function (btn, map) {
+      $("#news-modal").modal("toggle");
+      $("#weather-modal").modal("hide");
+      $("#covid-modal").modal("hide");
+      $("#stats-modal").modal("hide");
+    }
+  ).addTo(map);
+
   loaderFunction();
 });
 

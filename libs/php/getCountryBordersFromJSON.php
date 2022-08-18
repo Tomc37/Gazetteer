@@ -7,8 +7,7 @@
 
   $countryCode = $_REQUEST['countryCode'];
    
-  $result = file_get_contents("../util/countryBorders.geo.json");
-	$decode = json_decode("$result");
+  $result = file_get_contents("https://thomascockerill.co.uk/project1/libs/util/countryBorders.geo.json");
 	$features = $decode->features;
 	$filtered = array_values(array_filter($features, function($value) use ($countryCode) {
 		if ($value->properties->iso_a2 == $countryCode) {
