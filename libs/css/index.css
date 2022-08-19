@@ -42,12 +42,6 @@ html, body, #map {
   padding: 2px !important;
 }
 
-.leaflet-touch .leaflet-bar button {
-  width: 42px !important;
-  height: 42px !important;
-  line-height: 42px !important;
-}
-
 #map {
   z-index: 1;
 }
@@ -57,32 +51,6 @@ html, body, #map {
   top: 12px;
   left: 70px;
   z-index: 2;
-}
-
-#button-container {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  top: 90px;
-  left: 8px;
-  z-index: 2;
-  width: auto;
-  height: auto;
-}
-
-.button {
-  height: 60px;
-  width: 60px;
-  border-radius: 100%;
-  margin-bottom: 1rem;
-  background-color: black;
-  border: solid white 3px;
-}
-
-.info {
-  background-image: url("../util/Images/stats.png");
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
 #weather-button {
@@ -244,11 +212,6 @@ tr {
     margin-top: -250px;
   }
 
-  .button {
-    width: 40px;
-    height: 40px;
-  }
-
   #stats-flag {
     display: block;
     margin: 0 auto;
@@ -292,11 +255,5 @@ tr {
   .news-article-container h5 {
     margin-top: .75rem;
     color: rgba(0, 89, 255, 0.945);
-  }
-
-  .leaflet-touch .leaflet-bar button {
-    width: 30px !important;
-    height: 30px !important;
-    line-height: 30px !important;
   }
 }

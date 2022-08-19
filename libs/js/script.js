@@ -284,7 +284,7 @@ const getAllAPIData = async (countryCode) => {
       latitude: countryWeatherData.latitude,
       longitude: countryWeatherData.longitude,
     };
-    const countryCovidData = await getCovidData(countryCode);
+    // const countryCovidData = await getCovidData(countryCode);
     let countryNewsData = await getNewsData(countryCode);
     const uniqueTitles = [];
     countryNewsData = countryNewsData.filter((element) => {
@@ -314,7 +314,7 @@ const getAllAPIData = async (countryCode) => {
     return {
       countryBasicData,
       countryWeatherData,
-      countryCovidData,
+      // countryCovidData,
       countryNewsData,
       capitalCoords,
       cityCoords,
@@ -425,30 +425,30 @@ const apiToHTML = (countryAPIData) => {
   );
   $("#weather-forecast").html(countryAPIData.countryWeatherData.description);
   // Covid
-  $("#covid-icon").attr("src", "libs/util/Images/covid.png");
-  $("#covid-confirmed").html(
-    numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
-      numberFormat
-    )
-  );
-  $("#covid-deaths").html(
-    numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
-      numberFormat
-    )
-  );
-  $("#covid-recovered").html(
-    numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
-      numberFormat
-    )
-  );
-  $("#covid-cases-today").html(
-    numeral(countryAPIData.countryCovidData.today.confirmed).format(
-      numberFormat
-    )
-  );
-  $("#covid-deaths-today").html(
-    numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
-  );
+  // $("#covid-icon").attr("src", "libs/util/Images/covid.png");
+  // $("#covid-confirmed").html(
+  //   numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
+  //     numberFormat
+  //   )
+  // );
+  // $("#covid-deaths").html(
+  //   numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
+  //     numberFormat
+  //   )
+  // );
+  // $("#covid-recovered").html(
+  //   numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
+  //     numberFormat
+  //   )
+  // );
+  // $("#covid-cases-today").html(
+  //   numeral(countryAPIData.countryCovidData.today.confirmed).format(
+  //     numberFormat
+  //   )
+  // );
+  // $("#covid-deaths-today").html(
+  //   numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
+  // );
   // News
   $(".news-article-container").remove();
   countryAPIData.countryNewsData.forEach((article) => {
@@ -511,7 +511,7 @@ const loaderFunction = async () => {
 $(function () {
   //Add easybuttons
   L.easyButton(
-    "<i class='fa fa-info' style='font-size:18px;color:blue'>",
+    "<i class='fa fa-info' style='color:blue'>",
     function (btn, map) {
       $("#stats-modal").modal("toggle");
       $("#weather-modal").modal("hide");
@@ -521,7 +521,7 @@ $(function () {
   ).addTo(map);
 
   L.easyButton(
-    "<i class='fa fa-sun' style='font-size:18px;color:orange'>",
+    "<i class='fa fa-sun' style='color:orange'>",
     function (btn, map) {
       $("#weather-modal").modal("toggle");
       $("#stats-modal").modal("hide");
@@ -531,7 +531,7 @@ $(function () {
   ).addTo(map);
 
   L.easyButton(
-    "<i class='fa fa-virus' style='font-size:18px;color:red'>",
+    "<i class='fa fa-virus' style='color:red'>",
     function (btn, map) {
       $("#covid-modal").modal("toggle");
       $("#weather-modal").modal("hide");
@@ -541,7 +541,7 @@ $(function () {
   ).addTo(map);
 
   L.easyButton(
-    "<i class='fa fa-newspaper' style='font-size:18px;color:black'>",
+    "<i class='fa fa-newspaper' style='color:black'>",
     function (btn, map) {
       $("#news-modal").modal("toggle");
       $("#weather-modal").modal("hide");
