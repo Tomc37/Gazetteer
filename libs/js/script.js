@@ -307,6 +307,15 @@ const getAllAPIData = async (countryCode) => {
       return false;
     });
     let holidaysData = await getHolidaysData(countryCode);
+    const uniqueHolidays = [];
+    holidaysData = holidaysData.filter((element) => {
+      const isDuplicate = uniqueHolidays.includes(element.localName);
+      if (!isDuplicate) {
+        uniqueHolidays.push(element.localName);
+        return true;
+      }
+      return false;
+    });
     countryNewsData = countryNewsData.slice(0, 5);
     let cityCoords = await getCityCoords(countryCode);
     let capitalCoords = cityCoords.filter(city => 
@@ -453,6 +462,11 @@ const apiToHTML = (countryAPIData) => {
     const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></a>`;
     $(".news-articles-container").append(newDiv);
   });
+  // Holidays
+  countryAPIData.holidaysData.forEach((holiday) => {
+    const newDiv = `<tr><td class='table-head'>${holiday.localName}</td><td class='table-data'>${Date.parse(holiday.date).toString("MMMM dS")}</td></tr>`
+    $("#holidays-table").append(newDiv);
+  })
 };
 
 // Group common functions for loader and Select->Option Select
