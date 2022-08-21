@@ -240,6 +240,30 @@ const getNewsData = async (countryCode) => {
   return newsData.data.articles;
 };
 
+// National holidays data from https://date.nager.at/Api
+const getHolidaysData = async (countryCode) => {
+  const holidaysData = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: "libs/php/getHolidays.php",
+      type: "POST",
+      dataType: "JSON",
+      data: {
+        countryCode: countryCode,
+      },
+      success: function (result) {
+        resolve(result);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
+      },
+    })
+  })
+  return holidaysData.data;
+}
+
 // City coords for map markers
 const getCityCoords = async (countryCode) => {
   const cityCoords = await new Promise((resolve, reject) => {
@@ -282,6 +306,7 @@ const getAllAPIData = async (countryCode) => {
       }
       return false;
     });
+    let holidaysData = await getHolidaysData(countryCode);
     countryNewsData = countryNewsData.slice(0, 5);
     let cityCoords = await getCityCoords(countryCode);
     let capitalCoords = cityCoords.filter(city => 
@@ -300,6 +325,7 @@ const getAllAPIData = async (countryCode) => {
       countryWeatherData,
       // countryCovidData,
       countryNewsData,
+      holidaysData,
       capitalCoords,
       cityCoords
     };
@@ -516,6 +542,17 @@ $(function () {
     "<i class='fa fa-newspaper' style='font-size:1.25rem;color:black'>",
     function (btn, map) {
       $("#news-modal").modal("toggle");
+      $("#weather-modal").modal("hide");
+      $("#covid-modal").modal("hide");
+      $("#stats-modal").modal("hide");
+    }
+  ).addTo(map);
+
+  L.easyButton(
+    "<i class='fa fa-calendar' style='font-size:1.25rem;color:green'>",
+    function (btn, map) {
+      $("#holidays-modal").modal("toggle");
+      $("#news-modal").modal("hide");
       $("#weather-modal").modal("hide");
       $("#covid-modal").modal("hide");
       $("#stats-modal").modal("hide");

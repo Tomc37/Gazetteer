@@ -346,6 +346,22 @@ tr:nth-child(even) {
     margin-top: -300px;
   }
 
+  #weather-current-desc {
+    padding-left: 1rem;
+  }
+
+  #weather-forecast-three {
+    display: none;
+  }
+
+  #weather-forecast-two {
+    margin-right: 0;
+  }
+
+  .weather-forecast-day-numbers {
+    padding-left: 1rem;
+  }
+
   .news-article-container {
     display: flex;
     flex-direction: column;

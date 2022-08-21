@@ -5,7 +5,7 @@
 
 	$executionStartTime = microtime(true);
 
-	$url = "https://corona-api.com/countries/" . $_REQUEST['countryCode'];
+	$url = "https://date.nager.at/api/v3/publicholidays/" . date("Y") . "/" . $_REQUEST['countryCode'];
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
