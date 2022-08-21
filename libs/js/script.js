@@ -271,10 +271,6 @@ const getAllAPIData = async (countryCode) => {
     const countryWeatherData = await getWeatherData(
       countryBasicData.capital[0]
     );
-    const capitalCoords = {
-      latitude: countryWeatherData.latitude,
-      longitude: countryWeatherData.longitude,
-    };
     // const countryCovidData = await getCovidData(countryCode);
     let countryNewsData = await getNewsData(countryCode);
     const uniqueTitles = [];
@@ -288,14 +284,16 @@ const getAllAPIData = async (countryCode) => {
     });
     countryNewsData = countryNewsData.slice(0, 5);
     let cityCoords = await getCityCoords(countryCode);
-    let filteredCityCoords;
+    let capitalCoords = cityCoords.filter(city => 
+      city.name == countryBasicData.capital[0]
+    );
+    capitalCoords = capitalCoords[0];
     if (cityCoords) {
-      filteredCityCoords = cityCoords.filter(
-        (city) => city.name !== countryBasicData.capital[0] &&
-        city.fclName.includes("city")
+      cityCoords = cityCoords.filter(city => 
+          city.fclName.includes("city") && city.name !== capitalCoords.name
       );
-      filteredCityCoords.sort((a, b) => (a.population > b.population ? -1 : 1));
-      filteredCityCoords = cityCoords.slice(0, 8);
+      cityCoords.sort((a, b) => (a.population > b.population ? -1 : 1));
+      cityCoords = cityCoords.slice(0, 8);
     }
     return {
       countryBasicData,
@@ -303,8 +301,7 @@ const getAllAPIData = async (countryCode) => {
       // countryCovidData,
       countryNewsData,
       capitalCoords,
-      cityCoords,
-      filteredCityCoords
+      cityCoords
     };
   }
 };
@@ -325,10 +322,10 @@ const addMapMarkers = (capitalCoords, cityCoords) => {
     prefix: "fa",
   });
   countryMarkersMarkerCluster.addLayer(
-    L.marker([capitalCoords.latitude, capitalCoords.longitude], {
+    L.marker([capitalCoords.lat, capitalCoords.lng], {
       icon: capitalMarker,
     }).bindTooltip(
-      `Capital City: ${countryObject.countryAPIData.countryWeatherData.address}`,
+      `Capital City: ${capitalCoords.name}`,
       {
         permanent: false,
         direction: "right",
@@ -451,7 +448,7 @@ const groupedFunctions = async (countryCode) => {
   // Add additional map markers
   addMapMarkers(
     countryObject.countryAPIData.capitalCoords,
-    countryObject.countryAPIData.filteredCityCoords
+    countryObject.countryAPIData.cityCoords
   );
   $("#loading").hide();
   console.log(countryObject);
