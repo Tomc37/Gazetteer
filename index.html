@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="libs/css/all.css"/>
     <script src="libs/js/leaflet.js"></script>
     <script src="libs/js/numeral.min.js"></script>
+    <script src="libs/js/date.js"></script>
     <script src="libs/js/leaflet.extra-markers.min.js"></script>
     <script src="libs/js/leaflet.markercluster-src.js"></script>
     <script src="libs/js/easy-button.js"></script>
@@ -83,42 +84,46 @@
       </div>
       <div class="modal fade top-50 start-50" id="weather-modal">
         <div class="modal-dialog">
-          <div class="modal-header">
-            <h5 id="weather-title"></h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
           <div class="modal-body">
-            <img id="weather-icon" alt="weather-icon" />
-            <div class="table-container">
-              <table>
-                <tbody>
-                  <tr>
-                    <td class="table-head">Description</td>
-                    <td class="table-data" id="weather-description">1231232</td>
-                  </tr>
-                  <tr>
-                    <td class="table-head">Temperature</td>
-                    <td class="table-data" id="weather-temperature">1231232</td>
-                  </tr>
-                  <tr>
-                    <td class="table-head">Wind Speed</td>
-                    <td class="table-data" id="weather-wind-speed">1231232</td>
-                  </tr>
-                  <tr>
-                    <td class="table-head">UV Index</td>
-                    <td class="table-data" id="weather-uv-index">1231232</td>
-                  </tr>
-                  <tr>
-                    <td class="table-head">Forecast</td>
-                    <td class="table-data" id="weather-forecast">1231232</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <div id="weather-container">
+              <h5 id="weather-header"></h5>
+              <div id="weather-current">
+                <img id="weather-current-icon" alt="weather-icon" />
+                <div id="weather-current-numbers">
+                  <p class="weather-bold">TODAY</p>
+                  <p id="weather-current-high">10&#176</p>
+                  <p id="weather-current-low">1&#176</p>
+                </div>
+                <p id="weather-current-desc">description</p>
+              </div>
+              <div id="weather-forecast">
+                <div class="weather-forecast-day" id="weather-forecast-one">
+                  <img id="weather-forecast-one-icon">
+                  <div class="weather-forecast-day-numbers" id="weather-forecast-one-numbers">
+                    <p class="weather-bold" id="weather-forecast-one-date">Sun 11th</p>
+                    <p class="weather-bold" id="weather-forecast-one-high">10&#176</p>
+                    <p id="weather-forecast-one-low">1&#176</p>
+                  </div>
+                </div>
+                <div class="weather-forecast-day" id="weather-forecast-two">
+                  <img id="weather-forecast-two-icon">
+                  <div class="weather-forecast-day-numbers" id="weather-forecast-two-numbers">
+                    <p class="weather-bold" id="weather-forecast-two-date"></p>
+                    <p class="weather-bold" id="weather-forecast-two-high"></p>
+                    <p id="weather-forecast-two-low"></p>
+                  </div>
+                </div>
+                <div class="weather-forecast-day" id="weather-forecast-three">
+                  <img id="weather-forecast-three-icon">
+                  <div class="weather-forecast-day-numbers" id="weather-forecast-three-numbers">
+                    <p class="weather-bold" id="weather-forecast-three-date"></p>
+                    <p class="weather-bold" id="weather-forecast-three-high"></p>
+                    <p id="weather-forecast-three-low"></p>
+                  </div>
+                </div>
+              </div>
           </div>
-          <div class="modal-footer">
+          <div id="weather-footer" class="modal-footer">
             <button
               type="button"
               class="btn btn-secondary"
@@ -128,6 +133,7 @@
             </button>
           </div>
         </div>
+      </div>
       </div>
       <div class="modal fade top-50 start-50" id="covid-modal">
         <div class="modal-dialog">

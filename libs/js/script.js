@@ -324,23 +324,14 @@ const addMapMarkers = (capitalCoords, cityCoords) => {
   countryMarkersMarkerCluster.addLayer(
     L.marker([capitalCoords.lat, capitalCoords.lng], {
       icon: capitalMarker,
-    }).bindTooltip(
-      `Capital City: ${capitalCoords.name}`,
-      {
-        permanent: false,
-        direction: "right",
-      }
-    )
+    }).bindPopup(`<h5>${capitalCoords.name}</h5><p>Capital City</p><p>Population - ${numeral(capitalCoords.population).format(numberFormat)}`)
   );
   if (cityCoords) {
     cityCoords.forEach((city) => {
       countryMarkersMarkerCluster.addLayer(
         L.marker([city.lat, city.lng], {
           icon: cityMarker,
-        }).bindTooltip(`City: ${city.name}`, {
-          permanent: false,
-          direction: "right",
-        })
+        }).bindPopup(`<h5>${city.name}</h5><p>Population - ${numeral(city.population).format(numberFormat)}`)
       );
     });
   }
@@ -374,29 +365,37 @@ const apiToHTML = (countryAPIData) => {
   );
   $("#continent").html(countryAPIData.countryBasicData.region);
   // Weather
-  $("#weather-title").html(
+  $("#weather-header").html(
     `Weather in ${countryAPIData.countryWeatherData.address}`
   );
-  $("#weather-icon").attr(
+  $("#weather-current-icon").attr(
     "src",
     `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`
   );
-  $("#weather-description").html(
-    countryAPIData.countryWeatherData.currentConditions.conditions
+  $("#weather-current-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmax)}&#176`);
+  $("#weather-current-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmin)}&#176`);
+  $("#weather-current-desc").html(countryAPIData.countryWeatherData.days[0].conditions);
+  $("#weather-forecast-one-icon").attr(
+    "src",
+    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[1].icon}.png`
   );
-  $("#weather-time").html(
-    numeral(countryAPIData.countryWeatherData.currentConditions.datetime)
+  $("#weather-forecast-two-icon").attr(
+    "src",
+    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[2].icon}.png`
   );
-  $("#weather-temperature").html(
-    `${countryAPIData.countryWeatherData.currentConditions.temp}C`
+  $("#weather-forecast-three-icon").attr(
+    "src",
+    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[3].icon}.png`
   );
-  $("#weather-wind-speed").html(
-    `${countryAPIData.countryWeatherData.currentConditions.windspeed}mph`
-  );
-  $("#weather-uv-index").html(
-    countryAPIData.countryWeatherData.currentConditions.uvindex
-  );
-  $("#weather-forecast").html(countryAPIData.countryWeatherData.description);
+  $("#weather-forecast-one-date").html(Date.parse(countryAPIData.countryWeatherData.days[1].datetime).toString("ddd dS"));
+  $("#weather-forecast-two-date").html(Date.parse(countryAPIData.countryWeatherData.days[2].datetime).toString("ddd dS"));
+  $("#weather-forecast-three-date").html(Date.parse(countryAPIData.countryWeatherData.days[3].datetime).toString("ddd dS"));
+  $("#weather-forecast-one-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmax)}&#176`);
+  $("#weather-forecast-two-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmax)}&#176`);
+  $("#weather-forecast-three-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmax)}&#176`);
+  $("#weather-forecast-one-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmin)}&#176`);
+  $("#weather-forecast-two-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmin)}&#176`);
+  $("#weather-forecast-three-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmin)}&#176`);
   // Covid
   // $("#covid-icon").attr("src", "libs/util/Images/covid.png");
   // $("#covid-confirmed").html(
