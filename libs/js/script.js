@@ -1,25 +1,37 @@
 // Create LeafletJS FeatureGroup
 const countryMarkersFeatureGroup = L.featureGroup();
 
-// Create LeafletJS MarkerCluster
-const countryMarkersMarkerCluster = new L.markerClusterGroup({
-  maxClusterRadius: "20"
+// Create LeafletJS MarkerCluster for cities
+const cityMarkersMarkerCluster = new L.markerClusterGroup({
+  maxClusterRadius: "20",
+});
+
+const cameraMarkersMarkerCluster = new L.markerClusterGroup({
+  maxClusterRadius: "20",
 });
 
 // Load in LeafletJS TileLayers
-const Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	subdomains: 'abcd',
-	minZoom: 2,
-	maxZoom: 10,
-	ext: 'png'
-});
+const Stamen_Terrain = L.tileLayer(
+  "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}",
+  {
+    attribution:
+      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: "abcd",
+    minZoom: 2,
+    maxZoom: 10,
+    ext: "png",
+  }
+);
 
-const Stadia_Outdoors = L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png', {
-  minZoom: 2,
-	maxZoom: 10,
-	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-});
+const Stadia_Outdoors = L.tileLayer(
+  "https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",
+  {
+    minZoom: 2,
+    maxZoom: 10,
+    attribution:
+      '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+  }
+);
 
 const baseMaps = {
   "Stamen Terrain": Stamen_Terrain,
@@ -28,12 +40,11 @@ const baseMaps = {
 
 // Create LeafletJS map
 let map = L.map("map", {
-  layers: [Stamen_Terrain]
+  layers: [Stamen_Terrain],
 }).setView([0, 0], 3);
 
 // Create layercontrol for Tilelayers and cities
 let layersControl = L.control.layers(baseMaps).addTo(map);
-
 
 // Create object to store coords and country data
 let countryObject = {};
@@ -259,10 +270,10 @@ const getHolidaysData = async (countryCode) => {
         console.log(JSON.stringify(errorThrown));
         reject(JSON.stringify(errorThrown));
       },
-    })
-  })
+    });
+  });
   return holidaysData.data;
-}
+};
 
 // City coords for map markers
 const getCityCoords = async (countryCode) => {
@@ -288,6 +299,30 @@ const getCityCoords = async (countryCode) => {
   return cityCoords.data.geonames;
 };
 
+// Get data for webcams
+const getWebcams = async (countryCode) => {
+  const webcamCoords = await new Promise((resolve, reject) => {
+    $.ajax({
+      url: "libs/php/getWebcams.php",
+      type: "POST",
+      dataType: "JSON",
+      data: {
+        countryCode: countryCode,
+      },
+      success: function (result) {
+        resolve(result);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(JSON.stringify(errorThrown));
+        reject(JSON.stringify(errorThrown));
+      },
+    })
+  })
+  return webcamCoords.data.result.webcams;
+}
+
 // Group API Function Calls for eventual loading into countryObject
 const getAllAPIData = async (countryCode) => {
   {
@@ -295,7 +330,7 @@ const getAllAPIData = async (countryCode) => {
     const countryWeatherData = await getWeatherData(
       countryBasicData.capital[0]
     );
-    // const countryCovidData = await getCovidData(countryCode);
+    const countryCovidData = await getCovidData(countryCode);
     let countryNewsData = await getNewsData(countryCode);
     const uniqueTitles = [];
     countryNewsData = countryNewsData.filter((element) => {
@@ -318,32 +353,35 @@ const getAllAPIData = async (countryCode) => {
     });
     countryNewsData = countryNewsData.slice(0, 5);
     let cityCoords = await getCityCoords(countryCode);
-    let capitalCoords = cityCoords.filter(city => 
-      city.name == countryBasicData.capital[0]
+    let capitalCoords = cityCoords.filter(
+      (city) => city.name == countryBasicData.capital[0]
     );
     capitalCoords = capitalCoords[0];
     if (cityCoords) {
-      cityCoords = cityCoords.filter(city => 
+      cityCoords = cityCoords.filter(
+        (city) =>
           city.fclName.includes("city") && city.name !== capitalCoords.name
       );
       cityCoords.sort((a, b) => (a.population > b.population ? -1 : 1));
       cityCoords = cityCoords.slice(0, 8);
     }
+    const webcamCoords = await getWebcams(countryCode);
     return {
       countryBasicData,
       countryWeatherData,
-      // countryCovidData,
+      countryCovidData,
       countryNewsData,
       holidaysData,
       capitalCoords,
-      cityCoords
+      cityCoords,
+      webcamCoords,
     };
   }
 };
 
 // Functions to add map markers for capital and cities
-const addMapMarkers = (capitalCoords, cityCoords) => {
-  countryMarkersMarkerCluster.clearLayers();
+const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
+  cityMarkersMarkerCluster.clearLayers();
   const capitalMarker = L.ExtraMarkers.icon({
     markerColor: "red",
     icon: "fa-city",
@@ -356,24 +394,46 @@ const addMapMarkers = (capitalCoords, cityCoords) => {
     shape: "circle",
     prefix: "fa",
   });
-  countryMarkersMarkerCluster.addLayer(
+  const webcamMarker = L.ExtraMarkers.icon({
+    markerColor: "green",
+    icon: "fa-camera",
+    shape: "circle",
+    prefix: "fa",
+  });
+  cityMarkersMarkerCluster.addLayer(
     L.marker([capitalCoords.lat, capitalCoords.lng], {
       icon: capitalMarker,
-    }).bindPopup(`<h5>${capitalCoords.name}</h5><p>Capital City</p><p>Population - ${numeral(capitalCoords.population).format(numberFormat)}`)
+    }).bindPopup(
+      `<h5>${
+        capitalCoords.name
+      }</h5><p>Capital City</p><p>Population - ${numeral(
+        capitalCoords.population
+      ).format(numberFormat)}`
+    )
   );
   if (cityCoords) {
     cityCoords.forEach((city) => {
-      countryMarkersMarkerCluster.addLayer(
+      cityMarkersMarkerCluster.addLayer(
         L.marker([city.lat, city.lng], {
           icon: cityMarker,
-        }).bindPopup(`<h5>${city.name}</h5><p>Population - ${numeral(city.population).format(numberFormat)}`)
+        }).bindPopup(
+          `<h5>${city.name}</h5><p>Population - ${numeral(
+            city.population
+          ).format(numberFormat)}`
+        )
       );
     });
   }
-  countryMarkersMarkerCluster.addTo(map);
-  const overlayMaps = {
-    "Cities": countryMarkersMarkerCluster
+  cityMarkersMarkerCluster.addTo(map);
+  if (webcamCoords) {
+    webcamCoords.forEach((webcam) => {
+      countryMark
+    })
   }
+  
+  const overlayMaps = {
+    Cities: cityMarkersMarkerCluster,
+  };
   map.removeControl(layersControl);
   layersControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 };
@@ -407,9 +467,15 @@ const apiToHTML = (countryAPIData) => {
     "src",
     `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`
   );
-  $("#weather-current-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmax)}&#176`);
-  $("#weather-current-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmin)}&#176`);
-  $("#weather-current-desc").html(countryAPIData.countryWeatherData.days[0].conditions);
+  $("#weather-current-high").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmax)}&#176`
+  );
+  $("#weather-current-low").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmin)}&#176`
+  );
+  $("#weather-current-desc").html(
+    countryAPIData.countryWeatherData.days[0].conditions
+  );
   $("#weather-forecast-one-icon").attr(
     "src",
     `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[1].icon}.png`
@@ -422,40 +488,64 @@ const apiToHTML = (countryAPIData) => {
     "src",
     `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[3].icon}.png`
   );
-  $("#weather-forecast-one-date").html(Date.parse(countryAPIData.countryWeatherData.days[1].datetime).toString("ddd dS"));
-  $("#weather-forecast-two-date").html(Date.parse(countryAPIData.countryWeatherData.days[2].datetime).toString("ddd dS"));
-  $("#weather-forecast-three-date").html(Date.parse(countryAPIData.countryWeatherData.days[3].datetime).toString("ddd dS"));
-  $("#weather-forecast-one-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmax)}&#176`);
-  $("#weather-forecast-two-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmax)}&#176`);
-  $("#weather-forecast-three-high").html(`${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmax)}&#176`);
-  $("#weather-forecast-one-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmin)}&#176`);
-  $("#weather-forecast-two-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmin)}&#176`);
-  $("#weather-forecast-three-low").html(`${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmin)}&#176`);
+  $("#weather-forecast-one-date").html(
+    Date.parse(countryAPIData.countryWeatherData.days[1].datetime).toString(
+      "ddd dS"
+    )
+  );
+  $("#weather-forecast-two-date").html(
+    Date.parse(countryAPIData.countryWeatherData.days[2].datetime).toString(
+      "ddd dS"
+    )
+  );
+  $("#weather-forecast-three-date").html(
+    Date.parse(countryAPIData.countryWeatherData.days[3].datetime).toString(
+      "ddd dS"
+    )
+  );
+  $("#weather-forecast-one-high").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmax)}&#176`
+  );
+  $("#weather-forecast-two-high").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmax)}&#176`
+  );
+  $("#weather-forecast-three-high").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmax)}&#176`
+  );
+  $("#weather-forecast-one-low").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmin)}&#176`
+  );
+  $("#weather-forecast-two-low").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmin)}&#176`
+  );
+  $("#weather-forecast-three-low").html(
+    `${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmin)}&#176`
+  );
   // Covid
-  // $("#covid-icon").attr("src", "libs/util/Images/covid.png");
-  // $("#covid-confirmed").html(
-  //   numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-deaths").html(
-  //   numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-recovered").html(
-  //   numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-cases-today").html(
-  //   numeral(countryAPIData.countryCovidData.today.confirmed).format(
-  //     numberFormat
-  //   )
-  // );
-  // $("#covid-deaths-today").html(
-  //   numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
-  // );
+  $("#covid-icon").attr("src", "libs/util/Images/covid.png");
+  $("#covid-confirmed").html(
+    numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
+      numberFormat
+    )
+  );
+  $("#covid-deaths").html(
+    numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
+      numberFormat
+    )
+  );
+  $("#covid-recovered").html(
+    numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
+      numberFormat
+    )
+  );
+  $("#covid-cases-today").html(
+    numeral(countryAPIData.countryCovidData.today.confirmed).format(
+      numberFormat
+    )
+  );
+  $("#covid-deaths-today").html(
+    numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
+  );
   // News
   $(".news-article-container").remove();
   countryAPIData.countryNewsData.forEach((article) => {
@@ -464,9 +554,13 @@ const apiToHTML = (countryAPIData) => {
   });
   // Holidays
   countryAPIData.holidaysData.forEach((holiday) => {
-    const newDiv = `<tr><td class='table-head'>${holiday.localName}</td><td class='table-data'>${Date.parse(holiday.date).toString("MMMM dS")}</td></tr>`
+    const newDiv = `<tr><td class='table-head'>${
+      holiday.localName
+    }</td><td class='table-data'>${Date.parse(holiday.date).toString(
+      "MMMM dS"
+    )}</td></tr>`;
     $("#holidays-table").append(newDiv);
-  })
+  });
 };
 
 // Group common functions for loader and Select->Option Select
@@ -487,7 +581,8 @@ const groupedFunctions = async (countryCode) => {
   // Add additional map markers
   addMapMarkers(
     countryObject.countryAPIData.capitalCoords,
-    countryObject.countryAPIData.cityCoords
+    countryObject.countryAPIData.cityCoords,
+    countryObject.countryAPIData.webcamCoords
   );
   $("#loading").hide();
   console.log(countryObject);
@@ -529,6 +624,7 @@ $(function () {
       $("#weather-modal").modal("hide");
       $("#covid-modal").modal("hide");
       $("#news-modal").modal("hide");
+      $("#holidays-modal").modal("hide");
     }
   ).addTo(map);
 
@@ -539,6 +635,7 @@ $(function () {
       $("#stats-modal").modal("hide");
       $("#covid-modal").modal("hide");
       $("#news-modal").modal("hide");
+      $("#holidays-modal").modal("hide");
     }
   ).addTo(map);
 
@@ -549,6 +646,7 @@ $(function () {
       $("#weather-modal").modal("hide");
       $("#stats-modal").modal("hide");
       $("#news-modal").modal("hide");
+      $("#holidays-modal").modal("hide");
     }
   ).addTo(map);
 
@@ -559,6 +657,7 @@ $(function () {
       $("#weather-modal").modal("hide");
       $("#covid-modal").modal("hide");
       $("#stats-modal").modal("hide");
+      $("#holidays-modal").modal("hide");
     }
   ).addTo(map);
 
@@ -587,13 +686,13 @@ $("#country").change(async function () {
 
 // Remove modal on clicks
 $("#country").click(function () {
-  $("#stats-modal, #covid-modal, #weather-modal, #news-modal").modal("hide");
+  $("#stats-modal, #covid-modal, #weather-modal, #news-modal, #holiday-modal").modal("hide");
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });
 
 $("#map").click(function () {
-  $("#stats-modal, #covid-modal, #weather-modal, #news-modal").modal("hide");
+  $("#stats-modal, #covid-modal, #weather-modal, #news-modal, #holiday-modal").modal("hide");
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });
