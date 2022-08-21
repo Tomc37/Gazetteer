@@ -560,9 +560,10 @@ const apiToHTML = (countryAPIData) => {
     $(".news-articles-container").append(newDiv);
   });
   // Holidays
+  $("#holidays-table").empty();
   countryAPIData.holidaysData.forEach((holiday) => {
     const newDiv = `<tr><td class='table-head'>${
-      holiday.localName
+      holiday.name
     }</td><td class='table-data'>${Date.parse(holiday.date).toString(
       "MMMM dS"
     )}</td></tr>`;
