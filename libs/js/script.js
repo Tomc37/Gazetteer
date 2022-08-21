@@ -620,7 +620,6 @@ const groupedFunctions = async (countryCode) => {
     countryObject.countryAPIData.webcamCoords
   );
   $("#loading").hide();
-  console.log(countryObject);
   return countryObject;
 };
 
@@ -636,17 +635,24 @@ const loaderFunction = async () => {
   });
 
   // Get lat and long coords from device location
-  countryObject.coords = await getCoordsFromDeviceLocation();
+  try {
+    countryObject.coords = await getCoordsFromDeviceLocation();
+  } catch (err) {
+    console.log(err);
+  }
+  if (!countryObject.coords) {
+    $("#loading").hide();
+  } else {
+    // Get country data from Geonames from coords, languages, countryCode, countryName
+    countryObject.countryDataFromGeoNames = await getCountryFromLoc(
+      countryObject.coords
+    );
 
-  // Get country data from Geonames from coords, languages, countryCode, countryName
-  countryObject.countryDataFromGeoNames = await getCountryFromLoc(
-    countryObject.coords
-  );
+    // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers
+    await groupedFunctions(countryObject.countryDataFromGeoNames.countryCode);
 
-  // Run grouped functions to get border details, create border, get API data, populate HTML and add map markers
-  await groupedFunctions(countryObject.countryDataFromGeoNames.countryCode);
-
-  $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
+    $("#country").val(countryObject.countryDataFromGeoNames.countryCode);
+  }
 };
 
 // JQuery Document.Ready function for page load
