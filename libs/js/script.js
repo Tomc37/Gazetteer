@@ -6,7 +6,7 @@ const cityMarkersMarkerCluster = new L.markerClusterGroup({
   maxClusterRadius: "20",
 });
 
-const cameraMarkersMarkerCluster = new L.markerClusterGroup({
+const webcamMarkersMarkerCluster = new L.markerClusterGroup({
   maxClusterRadius: "20",
 });
 
@@ -382,6 +382,7 @@ const getAllAPIData = async (countryCode) => {
 // Functions to add map markers for capital and cities
 const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
   cityMarkersMarkerCluster.clearLayers();
+  webcamMarkersMarkerCluster.clearLayer();
   const capitalMarker = L.ExtraMarkers.icon({
     markerColor: "red",
     icon: "fa-city",
@@ -396,7 +397,7 @@ const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
   });
   const webcamMarker = L.ExtraMarkers.icon({
     markerColor: "green",
-    icon: "fa-camera",
+    icon: "fa-video",
     shape: "circle",
     prefix: "fa",
   });
@@ -427,19 +428,18 @@ const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
   cityMarkersMarkerCluster.addTo(map);
   if (webcamCoords) {
     webcamCoords.forEach((webcam) => {
-      cameraMarkersMarkerCluster.addLayer(
+      webcamMarkersMarkerCluster.addLayer(
         L.marker([webcam.location.latitude, webcam.location.longitude], {
           icon: webcamMarker,
         }).bindPopup(
-          `<a href='${webcam.url.current.desktop}'><h5>${webcam.title}</h5><img src=${webcam.image.current.thumbnail}/></a>`
+          `<a class='webcam-anchor' href='${webcam.url.current.desktop}' target='_blank'><h5 class='webcam-title'>${webcam.title}</h5><img class='webcam-image' src=${webcam.image.current.thumbnail}></a>`
         )
       )
     })
   }
-  
   const overlayMaps = {
     Cities: cityMarkersMarkerCluster,
-    Camera: cameraMarkersMarkerCluster,
+    Camera: webcamMarkersMarkerCluster,
   };
   map.removeControl(layersControl);
   layersControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
