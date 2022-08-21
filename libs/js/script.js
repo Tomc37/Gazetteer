@@ -318,10 +318,10 @@ const getWebcams = async (countryCode) => {
         console.log(JSON.stringify(errorThrown));
         reject(JSON.stringify(errorThrown));
       },
-    })
-  })
+    });
+  });
   return webcamCoords.data.result.webcams;
-}
+};
 
 // Group API Function Calls for eventual loading into countryObject
 const getAllAPIData = async (countryCode) => {
@@ -332,39 +332,56 @@ const getAllAPIData = async (countryCode) => {
     );
     const countryCovidData = await getCovidData(countryCode);
     let countryNewsData = await getNewsData(countryCode);
-    const uniqueTitles = [];
-    countryNewsData = countryNewsData.filter((element) => {
-      const isDuplicate = uniqueTitles.includes(element.title);
-      if (!isDuplicate) {
-        uniqueTitles.push(element.title);
-        return true;
-      }
-      return false;
-    });
+    if (countryNewsData) {
+      const uniqueTitles = [];
+      countryNewsData = countryNewsData.filter((element) => {
+        const isDuplicate = uniqueTitles.includes(element.title);
+        if (!isDuplicate) {
+          uniqueTitles.push(element.title);
+          return true;
+        }
+        return false;
+      });
+      countryNewsData = countryNewsData.slice(0, 5);
+    }
     let holidaysData = await getHolidaysData(countryCode);
-    const uniqueHolidays = [];
-    holidaysData = holidaysData.filter((element) => {
-      const isDuplicate = uniqueHolidays.includes(element.localName);
-      if (!isDuplicate) {
-        uniqueHolidays.push(element.localName);
-        return true;
-      }
-      return false;
-    });
-    countryNewsData = countryNewsData.slice(0, 5);
+    if (holidaysData) {
+      const uniqueHolidays = [];
+      holidaysData = holidaysData.filter((element) => {
+        const isDuplicate = uniqueHolidays.includes(element.localName);
+        if (!isDuplicate) {
+          uniqueHolidays.push(element.localName);
+          return true;
+        }
+        return false;
+      });
+    }
+
     let cityCoords = await getCityCoords(countryCode);
-    let capitalCoords = cityCoords.filter(
-      (city) => city.name == countryBasicData.capital[0]
-    );
-    capitalCoords = capitalCoords[0];
-    if (cityCoords) {
+    let capitalCoords;
+    if (countryCode == "US") {
+      capitalCoords = cityCoords.filter((city) => city.name === "Washington");
+      capitalCoords = capitalCoords[0];
       cityCoords = cityCoords.filter(
         (city) =>
           city.fclName.includes("city") && city.name !== capitalCoords.name
       );
-      cityCoords.sort((a, b) => (a.population > b.population ? -1 : 1));
       cityCoords = cityCoords.slice(0, 8);
+    } else {
+      capitalCoords = cityCoords.filter(
+        (city) => city.name == countryBasicData.capital[0]
+      );
+      capitalCoords = capitalCoords[0];
+      if (cityCoords) {
+        cityCoords = cityCoords.filter(
+          (city) =>
+            city.fclName.includes("city") && city.name !== capitalCoords.name
+        );
+        cityCoords.sort((a, b) => (a.population > b.population ? -1 : 1));
+        cityCoords = cityCoords.slice(0, 8);
+      }
     }
+    cityCoords = cityCoords;
     const webcamCoords = await getWebcams(countryCode);
     return {
       countryBasicData,
@@ -434,8 +451,8 @@ const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
         }).bindPopup(
           `<a class='webcam-anchor' href='${webcam.url.current.desktop}' target='_blank'><h5 class='webcam-title'>${webcam.title}</h5><img class='webcam-image' src=${webcam.image.current.thumbnail}></a>`
         )
-      )
-    })
+      );
+    });
   }
   const overlayMaps = {
     Cities: cityMarkersMarkerCluster,
@@ -449,126 +466,136 @@ const numberFormat = "0,0";
 // JQuery HTML Replacers
 const apiToHTML = (countryAPIData) => {
   // Basic Info
-  $("#stats-flag").attr("src", countryAPIData.countryBasicData.flags.png);
-  $("#country-name").html(countryAPIData.countryBasicData.name.common);
-  $("#country-code").html(countryAPIData.countryBasicData.cca2);
-  $("#population").html(
-    numeral(countryAPIData.countryBasicData.population).format(numberFormat)
-  );
-  let capital = "";
-  capital = countryAPIData.countryBasicData.capital[0];
-  for (i = 1; i < countryAPIData.countryBasicData.capital.length; i++) {
-    capital += `, ${countryAPIData.countryBasicData.capital[i]}`;
+  if (countryAPIData.countryBasicData) {
+    $("#stats-flag").attr("src", countryAPIData.countryBasicData.flags.png);
+    $("#country-name").html(countryAPIData.countryBasicData.name.common);
+    $("#country-code").html(countryAPIData.countryBasicData.cca2);
+    $("#population").html(
+      numeral(countryAPIData.countryBasicData.population).format(numberFormat)
+    );
+    let capital = "";
+    capital = countryAPIData.countryBasicData.capital[0];
+    for (i = 1; i < countryAPIData.countryBasicData.capital.length; i++) {
+      capital += `, ${countryAPIData.countryBasicData.capital[i]}`;
+    }
+    $("#capital").html(capital);
+    const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
+    $("#currency").html(
+      `${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`
+    );
+    $("#continent").html(countryAPIData.countryBasicData.region);
   }
-  $("#capital").html(capital);
-  const currency = Object.keys(countryAPIData.countryBasicData.currencies)[0];
-  $("#currency").html(
-    `${countryAPIData.countryBasicData.currencies[currency].name} - ${countryAPIData.countryBasicData.currencies[currency].symbol}`
-  );
-  $("#continent").html(countryAPIData.countryBasicData.region);
   // Weather
-  $("#weather-header").html(
-    `Weather in ${countryAPIData.countryWeatherData.address}`
-  );
-  $("#weather-current-icon").attr(
-    "src",
-    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`
-  );
-  $("#weather-current-high").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmax)}&#176`
-  );
-  $("#weather-current-low").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmin)}&#176`
-  );
-  $("#weather-current-desc").html(
-    countryAPIData.countryWeatherData.days[0].conditions
-  );
-  $("#weather-forecast-one-icon").attr(
-    "src",
-    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[1].icon}.png`
-  );
-  $("#weather-forecast-two-icon").attr(
-    "src",
-    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[2].icon}.png`
-  );
-  $("#weather-forecast-three-icon").attr(
-    "src",
-    `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[3].icon}.png`
-  );
-  $("#weather-forecast-one-date").html(
-    Date.parse(countryAPIData.countryWeatherData.days[1].datetime).toString(
-      "ddd dS"
-    )
-  );
-  $("#weather-forecast-two-date").html(
-    Date.parse(countryAPIData.countryWeatherData.days[2].datetime).toString(
-      "ddd dS"
-    )
-  );
-  $("#weather-forecast-three-date").html(
-    Date.parse(countryAPIData.countryWeatherData.days[3].datetime).toString(
-      "ddd dS"
-    )
-  );
-  $("#weather-forecast-one-high").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmax)}&#176`
-  );
-  $("#weather-forecast-two-high").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmax)}&#176`
-  );
-  $("#weather-forecast-three-high").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmax)}&#176`
-  );
-  $("#weather-forecast-one-low").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmin)}&#176`
-  );
-  $("#weather-forecast-two-low").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmin)}&#176`
-  );
-  $("#weather-forecast-three-low").html(
-    `${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmin)}&#176`
-  );
+  if (countryAPIData.countryWeatherData) {
+    $("#weather-header").html(
+      `Weather in ${countryAPIData.countryWeatherData.address}`
+    );
+    $("#weather-current-icon").attr(
+      "src",
+      `libs/util/Images/Weather/${countryAPIData.countryWeatherData.currentConditions.icon}.png`
+    );
+    $("#weather-current-high").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmax)}&#176`
+    );
+    $("#weather-current-low").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[0].tempmin)}&#176`
+    );
+    $("#weather-current-desc").html(
+      countryAPIData.countryWeatherData.days[0].conditions
+    );
+    $("#weather-forecast-one-icon").attr(
+      "src",
+      `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[1].icon}.png`
+    );
+    $("#weather-forecast-two-icon").attr(
+      "src",
+      `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[2].icon}.png`
+    );
+    $("#weather-forecast-three-icon").attr(
+      "src",
+      `libs/util/Images/Weather/${countryAPIData.countryWeatherData.days[3].icon}.png`
+    );
+    $("#weather-forecast-one-date").html(
+      Date.parse(countryAPIData.countryWeatherData.days[1].datetime).toString(
+        "ddd dS"
+      )
+    );
+    $("#weather-forecast-two-date").html(
+      Date.parse(countryAPIData.countryWeatherData.days[2].datetime).toString(
+        "ddd dS"
+      )
+    );
+    $("#weather-forecast-three-date").html(
+      Date.parse(countryAPIData.countryWeatherData.days[3].datetime).toString(
+        "ddd dS"
+      )
+    );
+    $("#weather-forecast-one-high").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmax)}&#176`
+    );
+    $("#weather-forecast-two-high").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmax)}&#176`
+    );
+    $("#weather-forecast-three-high").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmax)}&#176`
+    );
+    $("#weather-forecast-one-low").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[1].tempmin)}&#176`
+    );
+    $("#weather-forecast-two-low").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[2].tempmin)}&#176`
+    );
+    $("#weather-forecast-three-low").html(
+      `${Math.ceil(countryAPIData.countryWeatherData.days[3].tempmin)}&#176`
+    );
+  }
   // Covid
-  $("#covid-icon").attr("src", "libs/util/Images/covid.png");
-  $("#covid-confirmed").html(
-    numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
-      numberFormat
-    )
-  );
-  $("#covid-deaths").html(
-    numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
-      numberFormat
-    )
-  );
-  $("#covid-recovered").html(
-    numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
-      numberFormat
-    )
-  );
-  $("#covid-cases-today").html(
-    numeral(countryAPIData.countryCovidData.today.confirmed).format(
-      numberFormat
-    )
-  );
-  $("#covid-deaths-today").html(
-    numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
-  );
+  if (countryAPIData.countryCovidData) {
+    $("#covid-icon").attr("src", "libs/util/Images/covid.png");
+    $("#covid-confirmed").html(
+      numeral(countryAPIData.countryCovidData.latest_data.confirmed).format(
+        numberFormat
+      )
+    );
+    $("#covid-deaths").html(
+      numeral(countryAPIData.countryCovidData.latest_data.deaths).format(
+        numberFormat
+      )
+    );
+    $("#covid-recovered").html(
+      numeral(countryAPIData.countryCovidData.latest_data.recovered).format(
+        numberFormat
+      )
+    );
+    $("#covid-cases-today").html(
+      numeral(countryAPIData.countryCovidData.today.confirmed).format(
+        numberFormat
+      )
+    );
+    $("#covid-deaths-today").html(
+      numeral(countryAPIData.countryCovidData.today.deaths).format(numberFormat)
+    );
+  }
   // News
-  $(".news-article-container").remove();
-  countryAPIData.countryNewsData.forEach((article) => {
-    const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></a>`;
-    $(".news-articles-container").append(newDiv);
-  });
+  if (countryAPIData.countryNewsData) {
+    $(".news-article-container").remove();
+    countryAPIData.countryNewsData.forEach((article) => {
+      const newDiv = `<a class='news-article-container' href='${article.link}' target='_blank'><img src='${article.media}'/><h5>${article.title}</h5></a>`;
+      $(".news-articles-container").append(newDiv);
+    });
+  }
   // Holidays
-  $("#holidays-table").empty();
-  countryAPIData.holidaysData.forEach((holiday) => {
-    const newDiv = `<tr><td class='table-head'>${
-      holiday.name
-    }</td><td class='table-data'>${Date.parse(holiday.date).toString(
-      "MMMM dS"
-    )}</td></tr>`;
-    $("#holidays-table").append(newDiv);
-  });
+  if (countryAPIData.holidaysData) {
+    $("#holidays-table").empty();
+    countryAPIData.holidaysData.forEach((holiday) => {
+      const newDiv = `<tr><td class='table-head'>${Date.parse(
+        holiday.date
+      ).toString("MMMM dS")}</td><td class='table-data'>${
+        holiday.name
+      }</td></tr>`;
+      $("#holidays-table").append(newDiv);
+    });
+  }
 };
 
 // Group common functions for loader and Select->Option Select
@@ -694,13 +721,17 @@ $("#country").change(async function () {
 
 // Remove modal on clicks
 $("#country").click(function () {
-  $("#stats-modal, #covid-modal, #weather-modal, #news-modal, #holiday-modal").modal("hide");
+  $(
+    "#stats-modal, #covid-modal, #weather-modal, #news-modal, #holidays-modal"
+  ).modal("hide");
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });
 
 $("#map").click(function () {
-  $("#stats-modal, #covid-modal, #weather-modal, #news-modal, #holiday-modal").modal("hide");
+  $(
+    "#stats-modal, #covid-modal, #weather-modal, #news-modal, #holidays-modal"
+  ).modal("hide");
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
 });

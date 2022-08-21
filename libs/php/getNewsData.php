@@ -11,7 +11,7 @@
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		"x-api-key: cCk3xL_PBnWAWgu-zE7d6vTI6rSiFoSGcSbhCP3O6AU"
+		"x-api-key: FfgcX6G9G8jRISrk8c93dmuqRplac3LteGowgTHPgmA"
 	));
 	curl_setopt($ch, CURLOPT_URL,$url);
 
