@@ -33,34 +33,37 @@
         <div class="modal-dialog">
           <div class="modal-header">
             <h5>Country Information</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
           <div class="modal-body">
             <img id="stats-flag" alt="flag" />
             <div class="table-container">
               <table>
                 <tbody>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Country Name:</td>
+                  <tr>
+                    <td class="table-head">Country Name</td>
                     <td class="table-data" id="country-name">1231232</td>
                   </tr>
-                  <tr class="table-row-light">
-                    <td class="table-head">Country Code:</td>
+                  <tr>
+                    <td class="table-head">Country Code</td>
                     <td class="table-data" id="country-code">1231232</td>
                   </tr>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Population:</td>
+                  <tr>
+                    <td class="table-head">Population</td>
                     <td class="table-data" id="population">1231232</td>
                   </tr>
-                  <tr class="table-row-light">
-                    <td class="table-head">Capital City:</td>
+                  <tr>
+                    <td class="table-head">Capital City</td>
                     <td class="table-data" id="capital">1231232</td>
                   </tr>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Main Currency:</td>
+                  <tr>
+                    <td class="table-head">Main Currency</td>
                     <td class="table-data" id="currency">1231232</td>
                   </tr>
-                  <tr class="table-row-light">
-                    <td class="table-head">Continent:</td>
+                  <tr>
+                    <td class="table-head">Continent</td>
                     <td class="table-data" id="continent">1231232</td>
                   </tr>
                 </tbody>
@@ -82,34 +85,33 @@
         <div class="modal-dialog">
           <div class="modal-header">
             <h5 id="weather-title"></h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
           <div class="modal-body">
             <img id="weather-icon" alt="weather-icon" />
             <div class="table-container">
               <table>
                 <tbody>
-                  <tr class="table-row-light">
-                    <td class="table-head">Last Updated(Local):</td>
-                    <td class="table-data" id="weather-time">1231232</td>
-                  </tr>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Description:</td>
+                  <tr>
+                    <td class="table-head">Description</td>
                     <td class="table-data" id="weather-description">1231232</td>
                   </tr>
-                  <tr class="table-row-light">
-                    <td class="table-head">Temperature:</td>
+                  <tr>
+                    <td class="table-head">Temperature</td>
                     <td class="table-data" id="weather-temperature">1231232</td>
                   </tr>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Wind Speed:</td>
+                  <tr>
+                    <td class="table-head">Wind Speed</td>
                     <td class="table-data" id="weather-wind-speed">1231232</td>
                   </tr>
-                  <tr class="table-row-light">
-                    <td class="table-head">UV Index:</td>
+                  <tr>
+                    <td class="table-head">UV Index</td>
                     <td class="table-data" id="weather-uv-index">1231232</td>
                   </tr>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Forecast:</td>
+                  <tr>
+                    <td class="table-head">Forecast</td>
                     <td class="table-data" id="weather-forecast">1231232</td>
                   </tr>
                 </tbody>
@@ -131,30 +133,33 @@
         <div class="modal-dialog">
           <div class="modal-header">
             <h5>Covid Information</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
           <div class="modal-body">
             <img alt="covid-icon" id="covid-icon" />
             <div class="table-container">
               <table>
                 <tbody>
-                  <tr class="table-row-light">
-                    <td class="table-head">Total Confirmed Cases:</td>
+                  <tr>
+                    <td class="table-head">Total Confirmed Cases</td>
                     <td class="table-data" id="covid-confirmed">1231232</td>
                   </tr>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Total Deaths:</td>
+                  <tr>
+                    <td class="table-head">Total Deaths</td>
                     <td class="table-data" id="covid-deaths">1231232</td>
                   </tr>
-                  <tr class="table-row-light">
-                    <td class="table-head">Total Recovered:</td>
+                  <tr>
+                    <td class="table-head">Total Recovered</td>
                     <td class="table-data" id="covid-recovered">1231232</td>
                   </tr>
-                  <tr class="table-row-dark">
-                    <td class="table-head">Cases Today:</td>
+                  <tr>
+                    <td class="table-head">Cases Today</td>
                     <td class="table-data" id="covid-cases-today">1231232</td>
                   </tr>
-                  <tr class="table-row-light">
-                    <td class="table-head">Deaths Today:</td>
+                  <tr>
+                    <td class="table-head">Deaths Today</td>
                     <td class="table-data" id="covid-deaths-today">1231232</td>
                   </tr>
                 </tbody>
@@ -172,7 +177,7 @@
           </div>
         </div>
       </div>
-      <div class="modal fade top-50 start-50" id="news-modal">
+      <div class="modal fade top-50 start-50" id="news-modal" role="dialog">
         <div class="modal-dialog" id="news-modal-dialog">
           <div class="modal-header">
             <h3 id="news-modal-header">LATEST NEWS</h3>

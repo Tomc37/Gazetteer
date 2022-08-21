@@ -1,22 +1,39 @@
-// Create LeafletJS map
-const map = L.map("map").setView([0, 0], 3);
-
 // Create LeafletJS FeatureGroup
 const countryMarkersFeatureGroup = L.featureGroup();
 
 // Create LeafletJS MarkerCluster
-const countryMarkersMarkerCluster = new L.markerClusterGroup();
+const countryMarkersMarkerCluster = new L.markerClusterGroup({
+  maxClusterRadius: "20"
+});
 
-// Load in LeafletJS TileLayer
-L.tileLayer(
-  "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=4e4765b2-fdfd-45d0-ba9a-bfe35596092d",
-  {
-    minZoom: 2,
-    maxZoom: 10,
-    attribution:
-      '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-  }
-).addTo(map);
+// Load in LeafletJS TileLayers
+const Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	subdomains: 'abcd',
+	minZoom: 2,
+	maxZoom: 10,
+	ext: 'png'
+});
+
+const Stadia_Outdoors = L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png', {
+  minZoom: 2,
+	maxZoom: 10,
+	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+});
+
+const baseMaps = {
+  "Stamen Terrain": Stamen_Terrain,
+  "Stadia Outdoors": Stadia_Outdoors,
+};
+
+// Create LeafletJS map
+let map = L.map("map", {
+  layers: [Stamen_Terrain]
+}).setView([0, 0], 3);
+
+// Create layercontrol for Tilelayers and cities
+let layersControl = L.control.layers(baseMaps).addTo(map);
+
 
 // Create object to store coords and country data
 let countryObject = {};
@@ -115,7 +132,13 @@ const getCountryList = async () => {
 // Clear featureGroup layers, add geoJSON to featuregroup, add featuregroup to map and fit map bounds to featuregroup bounds
 function createBorder(geoJSON) {
   countryMarkersFeatureGroup.clearLayers();
-  L.geoJSON(geoJSON).addTo(countryMarkersFeatureGroup);
+  function polystyle(feature) {
+    return {
+      fillColor: "red",
+      color: "purple",
+    };
+  }
+  L.geoJSON(geoJSON, { style: polystyle }).addTo(countryMarkersFeatureGroup);
   countryMarkersFeatureGroup.addTo(map);
   map.fitBounds(countryMarkersFeatureGroup.getBounds());
 }
@@ -218,18 +241,14 @@ const getNewsData = async (countryCode) => {
 };
 
 // City coords for map markers
-const getCityCoords = async () => {
-  const bounds = await countryMarkersFeatureGroup.getBounds();
+const getCityCoords = async (countryCode) => {
   const cityCoords = await new Promise((resolve, reject) => {
     $.ajax({
       url: "libs/php/getCitiesFromGeonames.php",
       type: "POST",
-      dataType: "json",
+      dataType: "JSON",
       data: {
-        north: bounds._northEast.lat,
-        south: bounds._southWest.lat,
-        east: bounds._northEast.lng,
-        west: bounds._southWest.lng,
+        countryCode: countryCode,
       },
       success: function (result) {
         resolve(result);
@@ -243,34 +262,6 @@ const getCityCoords = async () => {
     });
   });
   return cityCoords.data.geonames;
-};
-
-// Landmark coords for map markers:
-const getLandmarkCoords = async () => {
-  const bounds = await countryMarkersFeatureGroup.getBounds();
-  const landmarkCoords = await new Promise((resolve, reject) => {
-    $.ajax({
-      url: "libs/php/getLandmarksFromGeonames.php",
-      type: "POST",
-      dataType: "json",
-      data: {
-        north: bounds._northEast.lat,
-        south: bounds._southWest.lat,
-        east: bounds._northEast.lng,
-        west: bounds._southWest.lng,
-      },
-      success: function (result) {
-        resolve(result);
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR);
-        console.log(textStatus);
-        console.log(JSON.stringify(errorThrown));
-        reject(JSON.stringify(errorThrown));
-      },
-    });
-  });
-  return landmarkCoords.data.geonames;
 };
 
 // Group API Function Calls for eventual loading into countryObject
@@ -296,20 +287,15 @@ const getAllAPIData = async (countryCode) => {
       return false;
     });
     countryNewsData = countryNewsData.slice(0, 5);
-    let cityCoords = await getCityCoords();
+    let cityCoords = await getCityCoords(countryCode);
+    let filteredCityCoords;
     if (cityCoords) {
-      cityCoords = cityCoords.filter(
-        (city) =>
-          city.countrycode == countryCode &&
-          city.name !== countryBasicData.capital[0]
+      filteredCityCoords = cityCoords.filter(
+        (city) => city.name !== countryBasicData.capital[0] &&
+        city.fclName.includes("city")
       );
-    }
-    let landmarkCoords = await getLandmarkCoords();
-    if (landmarkCoords) {
-      landmarkCoords = landmarkCoords.filter(
-        (landmark) =>
-          landmark.feature == "landmark" && landmark.countryCode == countryCode
-      );
+      filteredCityCoords.sort((a, b) => (a.population > b.population ? -1 : 1));
+      filteredCityCoords = cityCoords.slice(0, 8);
     }
     return {
       countryBasicData,
@@ -318,26 +304,23 @@ const getAllAPIData = async (countryCode) => {
       countryNewsData,
       capitalCoords,
       cityCoords,
-      landmarkCoords,
+      filteredCityCoords
     };
   }
 };
 
-// Functions to add map markers for capital and landmarks
-const addMapMarkers = (capitalCoords, cityCoords, landmarkCoords) => {
+// Functions to add map markers for capital and cities
+const addMapMarkers = (capitalCoords, cityCoords) => {
   countryMarkersMarkerCluster.clearLayers();
   const capitalMarker = L.ExtraMarkers.icon({
     markerColor: "red",
+    icon: "fa-city",
     shape: "circle",
     prefix: "fa",
   });
   const cityMarker = L.ExtraMarkers.icon({
-    markerColor: "yellow",
-    shape: "circle",
-    prefix: "fa",
-  });
-  const landmarkMarker = L.ExtraMarkers.icon({
-    markerColor: "green",
+    markerColor: "blue",
+    icon: "fa-city",
     shape: "circle",
     prefix: "fa",
   });
@@ -364,19 +347,12 @@ const addMapMarkers = (capitalCoords, cityCoords, landmarkCoords) => {
       );
     });
   }
-  if (landmarkCoords) {
-    landmarkCoords.forEach((landmark) => {
-      countryMarkersMarkerCluster.addLayer(
-        L.marker([landmark.lat, landmark.lng], {
-          icon: landmarkMarker,
-        }).bindTooltip(`Landmark: ${landmark.title}`, {
-          permanent: false,
-          direction: "right",
-        })
-      );
-    });
+  countryMarkersMarkerCluster.addTo(map);
+  const overlayMaps = {
+    "Cities": countryMarkersMarkerCluster
   }
-  map.addLayer(countryMarkersMarkerCluster);
+  map.removeControl(layersControl);
+  layersControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 };
 
 const numberFormat = "0,0";
@@ -475,10 +451,10 @@ const groupedFunctions = async (countryCode) => {
   // Add additional map markers
   addMapMarkers(
     countryObject.countryAPIData.capitalCoords,
-    countryObject.countryAPIData.cityCoords,
-    countryObject.countryAPIData.landmarkCoords
+    countryObject.countryAPIData.filteredCityCoords
   );
   $("#loading").hide();
+  console.log(countryObject);
   return countryObject;
 };
 
@@ -511,7 +487,7 @@ const loaderFunction = async () => {
 $(function () {
   //Add easybuttons
   L.easyButton(
-    "<i class='fa fa-info' style='color:blue'>",
+    "<i class='fa fa-table' style='font-size:1.25rem;color:blue'>",
     function (btn, map) {
       $("#stats-modal").modal("toggle");
       $("#weather-modal").modal("hide");
@@ -521,7 +497,7 @@ $(function () {
   ).addTo(map);
 
   L.easyButton(
-    "<i class='fa fa-sun' style='color:orange'>",
+    "<i class='fa fa-sun' style='font-size:1.25rem;color:orange'>",
     function (btn, map) {
       $("#weather-modal").modal("toggle");
       $("#stats-modal").modal("hide");
@@ -531,7 +507,7 @@ $(function () {
   ).addTo(map);
 
   L.easyButton(
-    "<i class='fa fa-virus' style='color:red'>",
+    "<i class='fa fa-virus' style='font-size:1.25rem;color:red'>",
     function (btn, map) {
       $("#covid-modal").modal("toggle");
       $("#weather-modal").modal("hide");
@@ -541,7 +517,7 @@ $(function () {
   ).addTo(map);
 
   L.easyButton(
-    "<i class='fa fa-newspaper' style='color:black'>",
+    "<i class='fa fa-newspaper' style='font-size:1.25rem;color:black'>",
     function (btn, map) {
       $("#news-modal").modal("toggle");
       $("#weather-modal").modal("hide");
