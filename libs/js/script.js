@@ -456,7 +456,7 @@ const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
   }
   const overlayMaps = {
     Cities: cityMarkersMarkerCluster,
-    Camera: webcamMarkersMarkerCluster,
+    Cameras: webcamMarkersMarkerCluster,
   };
   map.removeControl(layersControl);
   layersControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
