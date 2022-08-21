@@ -427,12 +427,19 @@ const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
   cityMarkersMarkerCluster.addTo(map);
   if (webcamCoords) {
     webcamCoords.forEach((webcam) => {
-      countryMark
+      cameraMarkersMarkerCluster.addLayer(
+        L.marker([webcam.location.latitude, webcam.location.longitude], {
+          icon: webcamMarker,
+        }).bindPopup(
+          `<a href='${webcam.url.current.desktop}'><h5>${webcam.title}</h5><img src=${webcam.image.current.thumbnail}/></a>`
+        )
+      )
     })
   }
   
   const overlayMaps = {
     Cities: cityMarkersMarkerCluster,
+    Camera: cameraMarkersMarkerCluster,
   };
   map.removeControl(layersControl);
   layersControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
