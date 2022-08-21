@@ -382,7 +382,7 @@ const getAllAPIData = async (countryCode) => {
 // Functions to add map markers for capital and cities
 const addMapMarkers = (capitalCoords, cityCoords, webcamCoords) => {
   cityMarkersMarkerCluster.clearLayers();
-  webcamMarkersMarkerCluster.clearLayer();
+  webcamMarkersMarkerCluster.clearLayers();
   const capitalMarker = L.ExtraMarkers.icon({
     markerColor: "red",
     icon: "fa-city",
