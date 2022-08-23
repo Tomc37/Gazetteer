@@ -326,6 +326,14 @@ tr:nth-child(even) {
   margin: 0 auto;
 }
 
+.close {
+  background-color: white;
+}
+
+.leaflet-popup-content-wrapper {
+  z-index: 99;
+}
+
 @media screen and (max-width: 400px) {
   .modal {
     background-color: white;
