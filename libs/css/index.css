@@ -344,11 +344,6 @@ tr:nth-child(even) {
     border: solid 1px black;
   }
 
-  #weather-modal {
-    margin-left: -177px !important;
-    width: 95% !important;
-  }
-
   #weather-current-icon {
     margin: 0 auto;
     width: 80px;
@@ -366,7 +361,7 @@ tr:nth-child(even) {
     font-size: .75rem;
   }
 
-  #news-modal {
+  #news-modal, #holidays-modal {
     margin-top: -300px;
   }
 
